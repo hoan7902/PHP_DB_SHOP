@@ -4,10 +4,10 @@ class Routes
 {
     public function __construct()
     {
-        $this->UrlProccess();
+        $this->urlProccess();
     }
 
-    private function UrlProccess()
+    private function urlProccess()
     {
         $method = $_SERVER['REQUEST_METHOD'];
         require_once("./routes/RoutesDefine.php");
