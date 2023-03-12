@@ -99,20 +99,20 @@ ALTER TABLE `userHaveOrders` ADD FOREIGN KEY (`orderId`) REFERENCES `Order` (`or
 
 ALTER TABLE `userHaveOrders` ADD FOREIGN KEY (`userId`) REFERENCES `User` (`userId`);
 
-ALTER TABLE `Product` ADD FOREIGN KEY (`productId`) REFERENCES `productsInCollection` (`productId`);
+ALTER TABLE `productsInCollection` ADD FOREIGN KEY (`productId`) REFERENCES `Product` (`productId`);
 
 ALTER TABLE `productsInCollection` ADD FOREIGN KEY (`collectionId`) REFERENCES `Collection` (`collectionId`);
 
-ALTER TABLE `Product` ADD FOREIGN KEY (`productId`) REFERENCES `productsInCategory` (`productId`);
+ALTER TABLE `productsInCategory` ADD FOREIGN KEY (`productId`) REFERENCES `Product` (`productId`);
 
-ALTER TABLE `Category` ADD FOREIGN KEY (`categoryId`) REFERENCES `productsInCategory` (`categoryId`);
+ALTER TABLE `productsInCategory` ADD FOREIGN KEY (`categoryId`) REFERENCES `Category` (`categoryId`);
 
-ALTER TABLE `User` ADD FOREIGN KEY (`userId`) REFERENCES `UserRatingProducts` (`userId`);
+ALTER TABLE `UserRatingProducts` ADD FOREIGN KEY (`userId`) REFERENCES `User` (`userId`);
 
-ALTER TABLE `Product` ADD FOREIGN KEY (`productId`) REFERENCES `UserRatingProducts` (`productId`);
+ALTER TABLE `UserRatingProducts` ADD FOREIGN KEY (`productId`) REFERENCES `Product` (`productId`);
 
-ALTER TABLE `Product` ADD FOREIGN KEY (`productId`) REFERENCES `Detail` (`productId`);
+ALTER TABLE `Detail` ADD FOREIGN KEY (`productId`) REFERENCES `Product` (`productId`);
 
-ALTER TABLE `Product` ADD FOREIGN KEY (`productId`) REFERENCES `Size` (`productId`);
+ALTER TABLE `Size` ADD FOREIGN KEY (`productId`) REFERENCES `Product` (`productId`);
 
-ALTER TABLE `Product` ADD FOREIGN KEY (`productId`) REFERENCES `Image` (`productId`);
+ALTER TABLE `Image` ADD FOREIGN KEY (`productId`) REFERENCES `Product` (`productId`);

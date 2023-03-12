@@ -8,7 +8,7 @@ class JWT {
     $this->secret = $secret;
   }
 
-  public function encode($payload, $expiresIn = '1h') {
+  public function encode($payload, $expiresIn = '30d') {
     $header = [
       'alg' => 'HS256',
       'typ' => 'JWT'
