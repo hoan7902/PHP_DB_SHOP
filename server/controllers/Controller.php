@@ -8,7 +8,7 @@ class Controller
         return new $model;
     }
 
-    public function response($code, $data)
+    public function response($data)
     {
         $headers = array(
             'Content-Type: application/json',
@@ -17,7 +17,10 @@ class Controller
         foreach ($headers as $header) {
             header($header);
         }
-        header('HTTP/1.1 ' . $code);
         echo json_encode($data);
+    }
+    public function status($code)
+    {
+        header('HTTP/1.1 ' . $code);
     }
 }

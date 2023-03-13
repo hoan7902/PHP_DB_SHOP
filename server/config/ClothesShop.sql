@@ -1,5 +1,5 @@
 CREATE TABLE `User` (
-  `userId` int(11) PRIMARY KEY,
+  `userId` int(11) PRIMARY KEY AUTO_INCREMENT,
   `name` varchar(255),
   `phone` varchar(20),
   `sex` varchar(10),
@@ -11,7 +11,7 @@ CREATE TABLE `User` (
 );
 
 CREATE TABLE `Order` (
-  `orderId` int(11) PRIMARY KEY,
+  `orderId` int(11) PRIMARY KEY AUTO_INCREMENT,
   `status` varchar(32),
   `phone` varchar(20),
   `cost` float,
@@ -22,31 +22,31 @@ CREATE TABLE `Order` (
 );
 
 CREATE TABLE `Product` (
-  `productId` int(11) PRIMARY KEY,
+  `productId` int(11) PRIMARY KEY AUTO_INCREMENT,
   `name` varchar(500),
   `price` float,
   `description` text
 );
 
 CREATE TABLE `Collection` (
-  `collectionId` int(11) PRIMARY KEY,
+  `collectionId` int(11) PRIMARY KEY AUTO_INCREMENT,
   `name` varchar(500),
   `description` text
 );
 
 CREATE TABLE `Category` (
-  `categoryId` int(11) PRIMARY KEY,
+  `categoryId` int(11) PRIMARY KEY AUTO_INCREMENT,
   `name` varchar(500),
   `description` text
 );
 
 CREATE TABLE `ProductInOrder` (
-  `productId` int(11) PRIMARY KEY,
+  `productId` int(11) PRIMARY KEY AUTO_INCREMENT,
   `orderId` int(11)
 );
 
 CREATE TABLE `userHaveOrders` (
-  `orderId` int(11) PRIMARY KEY,
+  `orderId` int(11) PRIMARY KEY AUTO_INCREMENT,
   `userId` int(11)
 );
 

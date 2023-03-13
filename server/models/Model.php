@@ -33,7 +33,7 @@ class Model extends Database
         $sql = "SELECT * FROM $this->table WHERE ";
         $where = [];
         foreach ($keys as $key => $value) {
-            array_push($where, "$key => '$value' ");
+            array_push($where, "$key = '$value' ");
         }
         $sql .= implode('AND ', $where);
         $sql .= '; ';
@@ -53,7 +53,6 @@ class Model extends Database
         $keys = implode(' , ', $keys);
         $values = "'" . implode("' , '", $values) . "'";
         $sql = "INSERT INTO $this->table ($keys) VALUES ($values) ; ";
-        echo $sql;
         $query = $this->query($sql);
         return $query;
     }
