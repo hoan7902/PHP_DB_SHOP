@@ -37,4 +37,4 @@ Some API endpoints require authentication using an access token. To get an acces
 
 -   Le Van Lam
 -   Email: vanlam.cs76@gmail.com
--   GitHub: VanLamCS
+-   GitHub: [VanLamCS](https://github.com/VanLamCS)
