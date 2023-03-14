@@ -1,6 +1,7 @@
 <?php
 require_once "JWT.php";
 require_once "./config/Const.php";
+require_once "./models/UserModel.php";
 
 
 function genToken($payload, $expiresIn = '30d')
@@ -39,4 +40,39 @@ function verifyToken($token)
     */
     $jwt = new JWT(SECRETKEY);
     return $jwt->verify($token);
+}
+
+function authHeader($authHeader, $checkId = null)
+{
+    $token = null;
+    if (str_starts_with($authHeader, "Bearer")) {
+        $authHeaderArr = explode(" ", $authHeader);
+        $token = $authHeaderArr[1];
+    } else {
+        return "Not Authorization";
+    }
+    $userModel = new UserModel();
+    if (verifyToken($token)) {
+        $payload = decodeToken($token);
+        $id = $payload["userId"] ? $payload['userId'] : null;
+        if ($id) {
+            try {
+                $user = $userModel->getUserById($id);
+                if ($user) {
+                    if ($user['role'] == 'admin') {
+                        return "admin";
+                    } else if ($checkId && $user['userId'] == $checkId) {
+                        return "self";
+                    } else {
+                        return $user['role'];
+                    }
+                }
+            } catch (Exception $e) {
+                return "Wrong token " . $e->getMessage();
+            }
+        }
+        return "Not Authentication";
+    } else {
+        return "Not Authorization";
+    }
 }

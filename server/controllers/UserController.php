@@ -1,8 +1,9 @@
 <?php
 
-require_once("./config/RestApi.php");
+require_once("./utils/RestApi.php");
 require_once("./utils/PasswordHelper.php");
 require_once("./utils/JWTHelper.php");
+require_once("./utils/HandleUri.php");
 
 class UserController extends Controller
 {
@@ -33,7 +34,7 @@ class UserController extends Controller
             if ($user) {
                 if (verifyPassword($password, $user['password'])) {
                     $this->status(200);
-                    return $this->response(['status' => true, 'token' => genToken(["userID" => $user['userId'], "role" => $user['role']])]);
+                    return $this->response(['status' => true, 'token' => genToken(["userId" => $user['userId'], "role" => $user['role']])]);
                 } else {
                     $this->status(400);
                     return $this->response(['status' => false, 'error' => "Login failed!"]);
@@ -81,17 +82,46 @@ class UserController extends Controller
 
     public function getUserById()
     {
-        require_once('./config/HandleUri.php');
         $handleUri = new HandleUri();
         $params = $handleUri->sliceUri();
-        $this->status(200);
-        $this->response(array('message' => 'This is API to get a user by Id', 'Id' => $params[2]));
+        $restAPI = new RestApi();
+        $authHeader = $restAPI->headerData('Authorization');
+        $role = authHeader($authHeader, $params[2]);
+        if ($role == 'admin' || $role == "self") {
+            $user = $this->userModel->getUserById($params[2]);
+            if ($user) {
+                $this->status(200);
+                $data = array("userId" => $user['userId'], "name" => $user["name"], "phone" => $user['phone'], "sex" => $user['sex'], "email" => $user['email'], "avatar" => $user['avatar'], "address" => $user['address']);
+                return $this->response(["status" => true, "user" => $data]);
+            } else {
+                $this->status(404);
+                return $this->response(["status" => false, 'error' => "User is not valid"]);
+            }
+        } else if ($role == 'Not Authorization') {
+            $this->status(401);
+            return $this->response(["status" => false, 'error' => "Not Authorization"]);
+        } else {
+            $this->status(403);
+            return $this->response(["status" => false, 'error' => "Not Authentication"]);
+        }
     }
 
     public function getUsers()
     {
-        $this->status(200);
-        return $this->response(['message' => 'API get all users']);
+        $restAPI = new RestApi();
+        $authHeader = $restAPI->headerData('Authorization');
+        $role = authHeader($authHeader);
+        if ($role == 'admin') {
+            $users = $this->userModel->getAll(['userId', 'name', 'phone', 'sex', 'email', 'avatar', 'address', 'role'], ['userId']);
+            $this->status(200);
+            return $this->response(["status" => true, "users" => $users]);
+        } else if ($role == 'Not Authorization') {
+            $this->status(401);
+            return $this->response(["status" => false, 'error' => "Not Authorization"]);
+        } else {
+            $this->status(403);
+            return $this->response(["status" => false, 'error' => "Not Authentication"]);
+        }
     }
 
     private function validateEmail(&$email)

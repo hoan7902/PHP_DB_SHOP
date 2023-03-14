@@ -8,14 +8,15 @@ class Model extends Database
         $this->connect();
         return $this->conn->query($sql);
     }
-    public function getAll($orderBys = [], $isLimited = false, $limit = 16)
+    public function getAll($selects = ['*'], $orderBys = [], $isLimited = false, $limit = 24)
     {
         $this->connect();
+        $columns = implode(', ', $selects);
         $orderByString = implode(' ', $orderBys);
         if ($orderByString) {
-            $sql = "SELECT * FROM $this->table WHERE status = '1' ORDER BY $orderByString";
+            $sql = "SELECT $columns FROM $this->table ORDER BY $orderByString";
         } else {
-            $sql = "SELECT * FROM $this->table WHERE status = '1' LIMIT $limit ";
+            $sql = "SELECT $columns FROM $this->table LIMIT $limit ";
         }
         if ($isLimited) {
             $sql .= " LIMIT $limit";

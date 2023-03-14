@@ -28,7 +28,14 @@ class JWT
 
   public function decode($token)
   {
-    list($encodedHeader, $encodedPayload, $encodedSignature) = explode('.', $token);
+    $tokenArr = explode('.', $token);
+    if (count($tokenArr) == 3) {
+      $encodedHeader = $tokenArr[0];
+      $encodedPayload = $tokenArr[1];
+      $encodedSignature = $tokenArr[2];
+    } else {
+      throw new Exception("Invalid token");
+    }
 
     $header = json_decode($this->base64UrlDecode($encodedHeader), true);
     $payload = json_decode($this->base64UrlDecode($encodedPayload), true);
@@ -49,7 +56,15 @@ class JWT
   }
   public function verify($token)
   {
-    list($encodedHeader, $encodedPayload, $encodedSignature) = explode('.', $token);
+
+    $tokenArr = explode('.', $token);
+    if (count($tokenArr) == 3) {
+      $encodedHeader = $tokenArr[0];
+      $encodedPayload = $tokenArr[1];
+      $encodedSignature = $tokenArr[2];
+    } else {
+      return false;
+    }
 
     $header = json_decode($this->base64UrlDecode($encodedHeader), true);
     $payload = json_decode($this->base64UrlDecode($encodedPayload), true);
