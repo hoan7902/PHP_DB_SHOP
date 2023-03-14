@@ -1,3 +1,10 @@
+# APIs
+
+-   [Login API](#login-api)
+-   [Register API](#register-api)
+-   [Get All Users API](#get-all-users-api)
+-   [Get User By ID API](#get-user-by-id-api)
+
 # Login API
 
 This API is used to authenticate users and generate access tokens for subsequent requests.
@@ -212,7 +219,7 @@ Example response body:
 }
 ```
 
-# Get Users By ID API
+# Get User By ID API
 
 This API allows admin/self to get an information about one user on the platform.
 
