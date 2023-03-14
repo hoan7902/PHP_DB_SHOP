@@ -40,6 +40,13 @@ CREATE TABLE `Category` (
   `description` text
 );
 
+CREATE TABLE `Cart` (
+  `cartId` int(11) PRIMARY KEY AUTO_INCREMENT,
+  `userId` int(11),
+  `productId` int(11),
+  `time` datetime
+);
+
 CREATE TABLE `ProductInOrder` (
   `productId` int(11) PRIMARY KEY AUTO_INCREMENT,
   `orderId` int(11)
@@ -90,6 +97,10 @@ CREATE TABLE `Image` (
   `imageLink` varchar(500),
   PRIMARY KEY (`productId`, `imageLink`)
 );
+
+ALTER TABLE `Cart` ADD FOREIGN KEY (`userId`) REFERENCES `User` (`userId`);
+
+ALTER TABLE `Cart` ADD FOREIGN KEY (`productId`) REFERENCES `Product` (`productId`);
 
 ALTER TABLE `ProductInOrder` ADD FOREIGN KEY (`productId`) REFERENCES `Product` (`productId`);
 
