@@ -22,14 +22,14 @@ class UserController extends Controller
         $password = $restAPI->bodyData('password');
         if (!$email || !$password) {
             $this->status(400);
-            return $this->response(['status' => false, 'error' => "Less data"]);
+            return $this->response(['status' => false, 'message' => "Less data"]);
         }
         try {
             $this->validateEmail($email);
             $this->validatePassword($password);
         } catch (Exception $e) {
             $this->status(400);
-            return $this->response(["status" => false, "error" => $e->getMessage()]);
+            return $this->response(["status" => false, "message" => $e->getMessage()]);
         }
         try {
             $user = $this->userModel->getUserByEmail($email);
@@ -39,15 +39,15 @@ class UserController extends Controller
                     return $this->response(['status' => true, 'token' => genToken(["userId" => $user['userId'], "role" => $user['role']])]);
                 } else {
                     $this->status(400);
-                    return $this->response(['status' => false, 'error' => "Login failed!"]);
+                    return $this->response(['status' => false, 'message' => "Login failed!"]);
                 }
             } else {
                 $this->status(400);
-                return $this->response(['status' => false, 'error' => 'Email is not exist!']);
+                return $this->response(['status' => false, 'message' => 'Email is not exist!']);
             }
         } catch (Exception $e) {
             $this->status(400);
-            return $this->response(['status' => false, 'error' => $e->getMessage()]);
+            return $this->response(['status' => false, 'message' => $e->getMessage()]);
         }
     }
 
@@ -60,7 +60,7 @@ class UserController extends Controller
 
         if (!$name || !$email || !$password) {
             $this->status(400);
-            return $this->response(['status' => false, "error" => "Less data"]);
+            return $this->response(['status' => false, "message" => "Less data"]);
         }
         try {
             $this->validateEmail($email);
@@ -68,7 +68,7 @@ class UserController extends Controller
             $this->validatePassword($password);
         } catch (Exception $e) {
             $this->status(400);
-            return $this->response(['status' => false, 'error' => $e->getMessage()]);
+            return $this->response(['status' => false, 'message' => $e->getMessage()]);
         }
         $password = hashPassword($password);
         try {
@@ -78,7 +78,7 @@ class UserController extends Controller
             return $this->response(["status" => true]);
         } catch (Exception $e) {
             $this->status(400);
-            return $this->response(['status' => false, 'error' => $e->getMessage()]);
+            return $this->response(['status' => false, 'message' => $e->getMessage()]);
         }
     }
 
@@ -97,14 +97,14 @@ class UserController extends Controller
                 return $this->response(["status" => true, "user" => $data]);
             } else {
                 $this->status(404);
-                return $this->response(["status" => false, 'error' => "User is not valid"]);
+                return $this->response(["status" => false, 'message' => "User is not valid"]);
             }
         } else if ($role == 'Not Authorization') {
             $this->status(401);
-            return $this->response(["status" => false, 'error' => "Not Authorization"]);
+            return $this->response(["status" => false, 'message' => "Not Authorization"]);
         } else {
             $this->status(403);
-            return $this->response(["status" => false, 'error' => "Not Authentication"]);
+            return $this->response(["status" => false, 'message' => "Not Authentication"]);
         }
     }
 
@@ -121,10 +121,10 @@ class UserController extends Controller
             return $this->response(["status" => true, "users" => $users]);
         } else if ($role == 'Not Authorization') {
             $this->status(401);
-            return $this->response(["status" => false, 'error' => "Not Authorization"]);
+            return $this->response(["status" => false, 'message' => "Not Authorization"]);
         } else {
             $this->status(403);
-            return $this->response(["status" => false, 'error' => "Not Authentication"]);
+            return $this->response(["status" => false, 'message' => "Not Authentication"]);
         }
     }
 
@@ -137,7 +137,7 @@ class UserController extends Controller
             $userId = $payload['userId'];
         } catch (Exception $e) {
             $this->status(401);
-            return $this->response(['status' => false, 'error' => 'Not Authentication']);
+            return $this->response(['status' => false, 'message' => 'Not Authentication']);
         }
         $role = authHeader($authHeader, $userId);
         if ($role == 'admin' || $role == 'self') {
@@ -146,42 +146,55 @@ class UserController extends Controller
             $sex = RestApi::bodyData('sex');
             $address = RestApi::bodyData('address');
             $avatar = RestApi::bodyData('avatar');
-            if ($name) {
+            $data = [];
+            if ($name != null) {
                 try {
                     $this->validateName($name);
+                    $data['name'] = $name;
                 } catch (Exception $e) {
                     $this->status(400);
-                    return $this->response(['status' => false, 'error' => $e->getMessage()]);
+                    return $this->response(['status' => false, 'message' => $e->getMessage()]);
                 }
             }
-            if ($phone) {
+            if ($phone != null) {
                 if (!$this->validatePhone($phone)) {
                     $this->status(400);
-                    return $this->response(['status' => false, 'error' => 'Phone number is wrong']);
+                    return $this->response(['status' => false, 'message' => 'Phone number is wrong']);
                 }
+                $data['phone'] = $phone;
             }
-            if ($sex != null) {
+            if ($sex !== null) {
                 if ((int)$sex == 0) {
                     $sex = "male";
+                    $data['sex'] = $sex;
                 } else if ((int)$sex == 1) {
                     $sex = "female";
+                    $data['sex'] = $sex;
                 } else {
                     $this->status(400);
-                    return $this->response(['status' => false, 'error' => 'Sex is wrong']);
+                    return $this->response(['status' => false, 'message' => 'Sex is wrong']);
                 }
             }
-            if ($address) {
+            if ($address != null) {
                 $address = trim($address);
-                if ($address == '') $address = null;
+                if ($address == '') {
+                    $address = null;
+                } else {
+                    $data['address'] = $address;
+                }
             }
-            if ($avatar) {
+            if ($avatar != null) {
                 $avatar = trim($avatar);
-                if ($avatar == '') $avatar = null;
+                if ($avatar == '') {
+                    $avatar = null;
+                } else {
+                    $data['avatar'] = $avatar;
+                }
             }
-            $data = ['name' => $name, 'phone' => $phone, 'address' => $address, 'sex' => $sex, 'avatar' => $avatar];
-            $data = array_filter($data, function ($value) {
-                return !is_null($value) || !$value;
-            });
+            if (!$name && !$phone && !$sex && !$address && !$avatar) {
+                $this->status(400);
+                return $this->response(['status' => false, 'message' => 'Nothing changes']);
+            }
             if ($this->userModel->updateOne(['userId' => $userId], $data)) {
                 $this->status(200);
                 return $this->response(['status' => true, 'message' => 'Update successful']);
@@ -191,10 +204,10 @@ class UserController extends Controller
             }
         } else if ($role == 'Not Authentication') {
             $this->status(401);
-            return $this->response(['status' => false, 'error' => 'Not Authorization']);
+            return $this->response(['status' => false, 'message' => 'Not Authorization']);
         } else {
             $this->status(403);
-            return $this->response(['status' => false, 'error' => 'Not Authentication']);
+            return $this->response(['status' => false, 'message' => 'Not Authentication']);
         }
     }
 

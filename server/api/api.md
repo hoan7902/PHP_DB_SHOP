@@ -4,6 +4,7 @@
 -   [Register API](#register-api)
 -   [Get Users API](#get-users-api)
 -   [Get User By ID API](#get-user-by-id-api)
+-   [Update Profile API](#update-profile-api)
 
 # Login API
 
@@ -209,7 +210,7 @@ Example response body:
 | Property | Type    | Description           |
 | -------- | ------- | --------------------- |
 | status   | boolean | Successful or Failed. |
-| error    | string  | Error message.        |
+| message  | string  | Error message.        |
 
 Example response body:
 
@@ -217,7 +218,7 @@ Example response body:
 {
     HTTP/1.1 401 Unauthorized
     "status": true,
-    "error": "Not Authorization"
+    "message": "Not Authorization"
 }
 ```
 
@@ -294,7 +295,7 @@ Example response body:
 | Property | Type    | Description           |
 | -------- | ------- | --------------------- |
 | status   | boolean | Successful or Failed. |
-| error    | string  | Error message.        |
+| message  | string  | Error message.        |
 
 Example response body:
 
@@ -302,6 +303,75 @@ Example response body:
 {
     HTTP/1.1 404 Not Found
     "status": true,
-    "error": "User is not valid"
+    "message": "User is not valid"
+}
+```
+
+# Update Profile API
+
+This API is used to update information.
+
+## Request
+
+`PUT /api/user/profile`
+
+### Headers
+
+| Header        | Description                          |
+| ------------- | ------------------------------------ |
+| Content-Type  | Required. Set to `application/json`. |
+| Authorization | Required. Set to `Bearer <token>`.   |
+
+### Body
+
+The request body should contain a JSON object with the following properties:
+
+| Property | Type   | Description                                     |
+| -------- | ------ | ----------------------------------------------- |
+| phone    | string | Optional. The phone number.                     |
+| sex      | number | Optional. Sex of the user (0: male, 1: female). |
+| avatar   | string | Optional. Avatar of the user.                   |
+| name     | string | Optional. The name of the user.                 |
+| address  | string | Optional. Address of the user.                  |
+
+Example request body:
+
+```json
+{
+    "name": "Le VanLam",
+    "phone": "0999999888",
+    "address": "Loc Son, Phu Loc, Thua Thien - Hue",
+    "sex": 0,
+    "avatar": "https://images.freeimages.com/images/previews/56f/butterfly-on-daisy-1560505.jpg"
+}
+```
+
+## Resonse
+
+If the request is successful, the server will respond with a JSON object containing a status (true or false) and a message.
+
+### HTTP Status Codes
+
+| Status Code | Description                                    |
+| ----------- | ---------------------------------------------- |
+| 200         | OK. Update successfully.                       |
+| 400         | Bad Request. Update failed with error message. |
+| 401         | Unauthorized. Not Authorization                |
+| 403         | Forbidden. Not Authentication                  |
+
+### Body
+
+| Property | Type    | Description           |
+| -------- | ------- | --------------------- |
+| status   | boolean | Successful or Failed. |
+| message  | string  | Just a message :vv.   |
+
+Example response body:
+
+```json
+{
+    HTTP/1.1 200 OK
+    "status": true,
+    "message": "Update successful"
 }
 ```
