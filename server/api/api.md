@@ -5,6 +5,7 @@
 -   [Get Users API](#get-users-api)
 -   [Get User By ID API](#get-user-by-id-api)
 -   [Update Profile API](#update-profile-api)
+-   [Upload A Product API](#upload-a-product-api)
 
 # Login API
 
@@ -342,7 +343,7 @@ Example request body:
     "phone": "0999999888",
     "address": "Loc Son, Phu Loc, Thua Thien - Hue",
     "sex": 0,
-    "avatar": "https://images.freeimages.com/images/previews/56f/butterfly-on-daisy-1560505.jpg"
+    "avatar": "image url"
 }
 ```
 
@@ -373,5 +374,124 @@ Example response body:
     HTTP/1.1 200 OK
     "status": true,
     "message": "Update successful"
+}
+```
+
+# Upload A Product API
+
+This API allows admin to create a new product.
+
+## Request
+
+`POST /api/product/add`
+
+### Headers
+
+| Header        | Description                          |
+| ------------- | ------------------------------------ |
+| Content-Type  | Required. Set to `application/json`. |
+| Authorization | Required. Set to `Bearer <token>`.   |
+
+### Body
+
+The request body should contain a JSON object with the following properties:
+
+| Property    | Type   | Description                                                                              |
+| ----------- | ------ | ---------------------------------------------------------------------------------------- |
+| name        | string | Required. The name of the product.                                                       |
+| description | string | Required. Product's description .                                                        |
+| sizes       | array  | Required. Includes objects containing the following fields: `sizename, quantity, price`. |
+| images      | array  | Required. Includes a list of url images.                                                 |
+
+Example request body:
+
+```json
+{
+    "name": "T-Shirt --LAM--",
+    "description": "Description.",
+    "sizes": [
+        {
+            "sizename": "S",
+            "quantity": 12,
+            "price": 230000
+        },
+        {
+            "sizename": "M",
+            "quantity": 13,
+            "price": 235000
+        },
+        {
+            "sizename": "L",
+            "quantity": 6,
+            "price": 240000
+        }
+    ],
+    "images": [
+        "image url 1",
+        "image url 2",
+        "image url 3",
+        "image url 4",
+        "image url 5",
+        "image url 6"
+    ]
+}
+```
+
+## Resonse
+
+### Success response
+
+If the request is successful, the server will respond with a JSON object containing a message about success or fail.
+
+#### HTTP Status Codes
+
+| Status Code | Description                                                         |
+| ----------- | ------------------------------------------------------------------- |
+| 201         | Created. The request was successful and a new resource was created. |
+| 400         | Bad Request. Request failed and return message.                     |
+
+#### Response Body
+
+| Property | Type    | Description            |
+| -------- | ------- | ---------------------- |
+| status   | boolean | Successful or Failed.  |
+| message  | string  | Just an inform string. |
+
+Example response body:
+
+```json
+{
+    HTTP/1.1 201 OK
+    "status": true,
+    "message": "Post successful"
+
+}
+```
+
+### Error responses
+
+#### HTTP Status Code
+
+| Status Code | Description                        |
+| ----------- | ---------------------------------- |
+| 400         | Bad Request. Throw message error   |
+| 401         | Unauthorized. Not Authorization    |
+| 403         | Forbidden. Not Authentication      |
+| 500         | Internal Server Error. Post failed |
+
+#### Response Body
+
+| Property | Type    | Description    |
+| -------- | ------- | -------------- |
+| status   | boolean | False. :<<     |
+| message  | string  | Error message. |
+
+Example response body:
+
+```json
+{
+    HTTP/1.1 403 Forbidden
+    "status": true,
+    "message": "Not Authentication"
 }
 ```
