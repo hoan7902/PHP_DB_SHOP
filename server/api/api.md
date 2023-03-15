@@ -2,7 +2,7 @@
 
 -   [Login API](#login-api)
 -   [Register API](#register-api)
--   [Get All Users API](#get-all-users-api)
+-   [Get Users API](#get-users-api)
 -   [Get User By ID API](#get-user-by-id-api)
 
 # Login API
@@ -124,13 +124,13 @@ Example response body:
 }
 ```
 
-# Get All Users API
+# Get Users API
 
-This API allows admin to get all information about users on the platform.
+This API allows admin to get information about users on the platform.
 
 ## Request
 
-`GET /api/users`
+`GET /api/users/{frame}`
 
 ### Headers
 
@@ -141,13 +141,15 @@ This API allows admin to get all information about users on the platform.
 
 ### Query parameters
 
-There are no query parameters required for this request.
+| Parameters | Data Type | Description             |
+| ---------- | --------- | ----------------------- |
+| frame      | integer   | Optional. Default is 1. |
 
 ## Resonse
 
 ### Successful responses
 
-A successful response returns a JSON object containing an array of all registered users.
+A successful response returns a JSON object containing an array of registered users in frame.
 
 #### HTTP Status Code
 

@@ -1,5 +1,7 @@
 <?php
 
+use function PHPSTORM_META\type;
+
 require_once("./utils/RestApi.php");
 require_once("./utils/PasswordHelper.php");
 require_once("./utils/JWTHelper.php");
@@ -108,11 +110,13 @@ class UserController extends Controller
 
     public function getUsers()
     {
+        $params = HandleUri::sliceUri();
+        $frame = $params[2] ? (int)$params[2] : 1;
         $restAPI = new RestApi();
         $authHeader = $restAPI->headerData('Authorization');
         $role = authHeader($authHeader);
         if ($role == 'admin') {
-            $users = $this->userModel->getAll(['userId', 'name', 'phone', 'sex', 'email', 'avatar', 'address', 'role'], ['userId']);
+            $users = $this->userModel->getNRecords(['userId', 'name', 'phone', 'sex', 'email', 'avatar', 'address', 'role'], [], ['userId'], $frame);
             $this->status(200);
             return $this->response(["status" => true, "users" => $users]);
         } else if ($role == 'Not Authorization') {
@@ -121,6 +125,76 @@ class UserController extends Controller
         } else {
             $this->status(403);
             return $this->response(["status" => false, 'error' => "Not Authentication"]);
+        }
+    }
+
+    public function updateProfile()
+    {
+        $authHeader = RestApi::headerData('Authorization');
+        $token = getTokenFromAuthHeader($authHeader);
+        try {
+            $payload = decodeToken($token);
+            $userId = $payload['userId'];
+        } catch (Exception $e) {
+            $this->status(401);
+            return $this->response(['status' => false, 'error' => 'Not Authentication']);
+        }
+        $role = authHeader($authHeader, $userId);
+        if ($role == 'admin' || $role == 'self') {
+            $name = RestApi::bodyData('name');
+            $phone = RestApi::bodyData('phone');
+            $sex = RestApi::bodyData('sex');
+            $address = RestApi::bodyData('address');
+            $avatar = RestApi::bodyData('avatar');
+            if ($name) {
+                try {
+                    $this->validateName($name);
+                } catch (Exception $e) {
+                    $this->status(400);
+                    return $this->response(['status' => false, 'error' => $e->getMessage()]);
+                }
+            }
+            if ($phone) {
+                if (!$this->validatePhone($phone)) {
+                    $this->status(400);
+                    return $this->response(['status' => false, 'error' => 'Phone number is wrong']);
+                }
+            }
+            if ($sex != null) {
+                if ((int)$sex == 0) {
+                    $sex = "male";
+                } else if ((int)$sex == 1) {
+                    $sex = "female";
+                } else {
+                    $this->status(400);
+                    return $this->response(['status' => false, 'error' => 'Sex is wrong']);
+                }
+            }
+            if ($address) {
+                $address = trim($address);
+                if ($address == '') $address = null;
+            }
+            if ($avatar) {
+                $avatar = trim($avatar);
+                if ($avatar == '') $avatar = null;
+            }
+            $data = ['name' => $name, 'phone' => $phone, 'address' => $address, 'sex' => $sex, 'avatar' => $avatar];
+            $data = array_filter($data, function ($value) {
+                return !is_null($value) || !$value;
+            });
+            if ($this->userModel->updateOne(['userId' => $userId], $data)) {
+                $this->status(200);
+                return $this->response(['status' => true, 'message' => 'Update successful']);
+            } else {
+                $this->status(500);
+                return $this->response(['status' => false, 'message' => 'Update failed']);
+            }
+        } else if ($role == 'Not Authentication') {
+            $this->status(401);
+            return $this->response(['status' => false, 'error' => 'Not Authorization']);
+        } else {
+            $this->status(403);
+            return $this->response(['status' => false, 'error' => 'Not Authentication']);
         }
     }
 
@@ -133,6 +207,7 @@ class UserController extends Controller
         }
         return $email;
     }
+
     private function validateName(&$name)
     {
         $name = trim($name);
@@ -141,6 +216,7 @@ class UserController extends Controller
         }
         return $name;
     }
+
     private function validatePassword(&$password, $min = 6, $max = 100)
     {
         $password = trim($password);
@@ -148,5 +224,12 @@ class UserController extends Controller
             throw new Exception("Length of password must be in range [$min, $max]");
         }
         return $password;
+    }
+
+    private function validatePhone(&$phone)
+    {
+        $phone = trim($phone);
+        if (preg_match('/^\(?(\d{3})\)?[- ]?(\d{3})[- ]?(\d{4})$/', $phone)) return true;
+        return false;
     }
 }

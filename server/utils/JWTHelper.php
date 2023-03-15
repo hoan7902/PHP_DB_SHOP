@@ -76,3 +76,12 @@ function authHeader($authHeader, $checkId = null)
         return "Not Authorization";
     }
 }
+function getTokenFromAuthHeader($authHeader)
+{
+    $token = null;
+    if (str_starts_with($authHeader, "Bearer")) {
+        $authHeaderArr = explode(" ", $authHeader);
+        $token = $authHeaderArr[1];
+    }
+    return $token;
+}

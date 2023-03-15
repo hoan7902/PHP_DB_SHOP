@@ -2,7 +2,7 @@
 
 class HandleUri
 {
-    public function sliceUri()
+    static public function sliceUri()
     {
         if (isset($_GET['uri'])) {
             return explode('/', trim($_GET['uri']));

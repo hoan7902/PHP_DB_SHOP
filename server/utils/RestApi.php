@@ -2,7 +2,7 @@
 
 class RestApi
 {
-    public function bodyData($key = null)
+    static public function bodyData($key = null)
     {
         $requestBody = file_get_contents('php://input');
         if (!$key) {
@@ -11,7 +11,7 @@ class RestApi
             return isset(json_decode($requestBody, true)[$key]) ? json_decode($requestBody, true)[$key] : null;
         }
     }
-    public function headerData($key = null)
+    static public function headerData($key = null)
     {
         $headers = getallheaders();
         if (!$key) {
