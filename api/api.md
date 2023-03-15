@@ -330,7 +330,7 @@ The request body should contain a JSON object with the following properties:
 | Property | Type   | Description                                     |
 | -------- | ------ | ----------------------------------------------- |
 | phone    | string | Optional. The phone number.                     |
-| sex      | number | Optional. Sex of the user (0: male, 1: female). |
+| sex      | number | Optional. Sex of the user (1: male, 2: female). |
 | avatar   | string | Optional. Avatar of the user.                   |
 | name     | string | Optional. The name of the user.                 |
 | address  | string | Optional. Address of the user.                  |
@@ -359,6 +359,7 @@ If the request is successful, the server will respond with a JSON object contain
 | 400         | Bad Request. Update failed with error message. |
 | 401         | Unauthorized. Not Authorization                |
 | 403         | Forbidden. Not Authentication                  |
+| 500         | Internal Server Error. Update failed           |
 
 ### Body
 

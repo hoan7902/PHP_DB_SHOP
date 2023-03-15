@@ -163,11 +163,11 @@ class UserController extends Controller
                 }
                 $data['phone'] = $phone;
             }
-            if ($sex !== null) {
-                if ((int)$sex == 0) {
+            if ($sex != null) {
+                if ((int)$sex == 1) {
                     $sex = "male";
                     $data['sex'] = $sex;
-                } else if ((int)$sex == 1) {
+                } else if ((int)$sex == 2) {
                     $sex = "female";
                     $data['sex'] = $sex;
                 } else {
