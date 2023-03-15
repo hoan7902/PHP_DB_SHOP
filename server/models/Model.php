@@ -56,6 +56,30 @@ class Model extends Database
         $query = $this->query($sql);
         return $query;
     }
+    public function insertMul($keys, $values)
+    {
+        $keyStr = implode(", ", $keys);
+        $str = [];
+        $temp = null;
+        for ($i = 0; $i < count($values); $i++) {
+            $subStr = "";
+            for ($j = 0; $j < count($keys); $j++) {
+                $temp = $values[$i]["$keys[$j]"];
+                if ($j == 0) {
+                    $subStr = "('$temp";
+                } else if ($j > 0 && $j < count($keys) - 1) {
+                    $subStr = $subStr . "', '$temp";
+                } else {
+                    $subStr = $subStr . "', '$temp')";
+                }
+            }
+            array_push($str, $subStr);
+        }
+        $str = implode(", ", $str);
+        $sql = "INSERT INTO $this->table ($keyStr) VALUES $str ;";
+        $query = $this->query($sql);
+        return $query;
+    }
     public function getNRecords($selects = ['*'], $keys = [],  $orderBys = [], $frame = 1, $limit = 24)
     {
         $columns = implode(', ', $selects);
@@ -101,5 +125,19 @@ class Model extends Database
             return true;
         }
         return false;
+    }
+    public function delete($keys)
+    {
+        $whereArr = [];
+        foreach ($keys as $key => $value) {
+            array_push($whereArr, "$key = '$value' ");
+        }
+        $whereStr = implode('AND ', $whereArr);
+        $sql = "DELETE FROM $this->table WHERE $whereStr ;";
+        return $this->query($sql);
+    }
+    public function getConn()
+    {
+        return $this->conn;
     }
 }

@@ -22,7 +22,7 @@ class UserController extends Controller
         $password = $restAPI->bodyData('password');
         if (!$email || !$password) {
             $this->status(400);
-            return $this->response(['status' => false, 'message' => "Less data"]);
+            return $this->response(['status' => false, 'message' => "Missing data"]);
         }
         try {
             $this->validateEmail($email);
@@ -60,7 +60,7 @@ class UserController extends Controller
 
         if (!$name || !$email || !$password) {
             $this->status(400);
-            return $this->response(['status' => false, "message" => "Less data"]);
+            return $this->response(['status' => false, "message" => "Missing data"]);
         }
         try {
             $this->validateEmail($email);

@@ -24,8 +24,8 @@ CREATE TABLE `Order` (
 CREATE TABLE `Product` (
   `productId` int(11) PRIMARY KEY AUTO_INCREMENT,
   `name` varchar(500),
-  `price` float,
-  `description` text
+  `description` text,
+  `deleted` boolean
 );
 
 CREATE TABLE `Collection` (
@@ -52,18 +52,18 @@ CREATE TABLE `ProductInOrder` (
   `orderId` int(11)
 );
 
-CREATE TABLE `userHaveOrders` (
+CREATE TABLE `UserHaveOrders` (
   `orderId` int(11) PRIMARY KEY AUTO_INCREMENT,
   `userId` int(11)
 );
 
-CREATE TABLE `productsInCollection` (
+CREATE TABLE `ProductsInCollection` (
   `productId` int(11),
   `collectionId` int(11),
   PRIMARY KEY (`productId`, `collectionId`)
 );
 
-CREATE TABLE `productsInCategory` (
+CREATE TABLE `ProductsInCategory` (
   `productId` int(11),
   `categoryId` int(11),
   PRIMARY KEY (`productId`, `categoryId`)
@@ -89,7 +89,8 @@ CREATE TABLE `Size` (
   `sizeName` varchar(10),
   `quantity` int,
   `productId` int(11),
-  PRIMARY KEY (`sizeName`, `quantity`, `productId`)
+  `price` float,
+  PRIMARY KEY (`sizeName`, `quantity`, `productId`, `price`)
 );
 
 CREATE TABLE `Image` (
@@ -98,32 +99,32 @@ CREATE TABLE `Image` (
   PRIMARY KEY (`productId`, `imageLink`)
 );
 
-ALTER TABLE `Cart` ADD FOREIGN KEY (`userId`) REFERENCES `User` (`userId`);
+ALTER TABLE `Cart` ADD CONSTRAINT `cart_user_fk` FOREIGN KEY (`userId`) REFERENCES `User` (`userId`) ON DELETE CASCADE;
 
-ALTER TABLE `Cart` ADD FOREIGN KEY (`productId`) REFERENCES `Product` (`productId`);
+ALTER TABLE `Cart` ADD CONSTRAINT `cart_product_fk` FOREIGN KEY (`productId`) REFERENCES `Product` (`productId`) ON DELETE CASCADE;
 
-ALTER TABLE `ProductInOrder` ADD FOREIGN KEY (`productId`) REFERENCES `Product` (`productId`);
+ALTER TABLE `ProductInOrder` ADD CONSTRAINT `productinorder_product_fk` FOREIGN KEY (`productId`) REFERENCES `Product` (`productId`) ON DELETE CASCADE;
 
-ALTER TABLE `ProductInOrder` ADD FOREIGN KEY (`orderId`) REFERENCES `Order` (`orderId`);
+ALTER TABLE `ProductInOrder` ADD CONSTRAINT `productinorder_order_fk` FOREIGN KEY (`orderId`) REFERENCES `Order` (`orderId`) ON DELETE CASCADE;
 
-ALTER TABLE `userHaveOrders` ADD FOREIGN KEY (`orderId`) REFERENCES `Order` (`orderId`);
+ALTER TABLE `UserHaveOrders` ADD CONSTRAINT `userhaveorders_order_fk` FOREIGN KEY (`orderId`) REFERENCES `Order` (`orderId`) ON DELETE CASCADE;
 
-ALTER TABLE `userHaveOrders` ADD FOREIGN KEY (`userId`) REFERENCES `User` (`userId`);
+ALTER TABLE `UserHaveOrders` ADD CONSTRAINT `userhaveorders_user_fk` FOREIGN KEY (`userId`) REFERENCES `User` (`userId`) ON DELETE CASCADE;
 
-ALTER TABLE `productsInCollection` ADD FOREIGN KEY (`productId`) REFERENCES `Product` (`productId`);
+ALTER TABLE `ProductsInCollection` ADD CONSTRAINT `productsincollection_product_fk` FOREIGN KEY (`productId`) REFERENCES `Product` (`productId`) ON DELETE CASCADE;
 
-ALTER TABLE `productsInCollection` ADD FOREIGN KEY (`collectionId`) REFERENCES `Collection` (`collectionId`);
+ALTER TABLE `ProductsInCollection` ADD CONSTRAINT `productsincollection_collection_fk` FOREIGN KEY (`collectionId`) REFERENCES `Collection` (`collectionId`) ON DELETE CASCADE;
 
-ALTER TABLE `productsInCategory` ADD FOREIGN KEY (`productId`) REFERENCES `Product` (`productId`);
+ALTER TABLE `ProductsInCategory` ADD CONSTRAINT `productsincategory_product_fk` FOREIGN KEY (`productId`) REFERENCES `Product` (`productId`) ON DELETE CASCADE;
 
-ALTER TABLE `productsInCategory` ADD FOREIGN KEY (`categoryId`) REFERENCES `Category` (`categoryId`);
+ALTER TABLE `ProductsInCategory` ADD CONSTRAINT `productsincategory_category_fk` FOREIGN KEY (`categoryId`) REFERENCES `Category` (`categoryId`) ON DELETE CASCADE;
 
-ALTER TABLE `UserRatingProducts` ADD FOREIGN KEY (`userId`) REFERENCES `User` (`userId`);
+ALTER TABLE `UserRatingProducts` ADD CONSTRAINT `userratingproducts_user_fk` FOREIGN KEY (`userId`) REFERENCES `User` (`userId`) ON DELETE CASCADE;
 
-ALTER TABLE `UserRatingProducts` ADD FOREIGN KEY (`productId`) REFERENCES `Product` (`productId`);
+ALTER TABLE `UserRatingProducts` ADD CONSTRAINT `userratingproducts_product_fk` FOREIGN KEY (`productId`) REFERENCES `Product` (`productId`) ON DELETE CASCADE;
 
-ALTER TABLE `Detail` ADD FOREIGN KEY (`productId`) REFERENCES `Product` (`productId`);
+ALTER TABLE `Detail` ADD CONSTRAINT `detail_product_fk` FOREIGN KEY (`productId`) REFERENCES `Product` (`productId`) ON DELETE CASCADE;
 
-ALTER TABLE `Size` ADD FOREIGN KEY (`productId`) REFERENCES `Product` (`productId`);
+ALTER TABLE `Size` ADD CONSTRAINT `size_product_fk` FOREIGN KEY (`productId`) REFERENCES `Product` (`productId`) ON DELETE CASCADE;
 
-ALTER TABLE `Image` ADD FOREIGN KEY (`productId`) REFERENCES `Product` (`productId`);
+ALTER TABLE `Image` ADD CONSTRAINT `image_product_fk` FOREIGN KEY (`productId`) REFERENCES `Product` (`productId`) ON DELETE CASCADE;
