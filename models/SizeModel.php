@@ -21,4 +21,8 @@ class SizeModel extends Model
     {
         return $this->delete($keys);
     }
+    public function getByProductId($productId, $selects)
+    {
+        return $this->getBy(['productId' => $productId], $selects);
+    }
 }

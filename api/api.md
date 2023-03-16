@@ -6,6 +6,7 @@
 -   [Get User By ID API](#get-user-by-id-api)
 -   [Update Profile API](#update-profile-api)
 -   [Upload A Product API](#upload-a-product-api)
+-   [Get A Detail Product API](#get-a-detail-product-api)
 
 # Login API
 
@@ -229,7 +230,7 @@ This API allows admin/self to get an information about one user on the platform.
 
 ## Request
 
-`GET /api/user/:id`
+`GET /api/user/{userId}`
 
 ### Headers
 
@@ -240,7 +241,7 @@ This API allows admin/self to get an information about one user on the platform.
 
 ### Query parameters
 
-There are 1 query parameters required for this request.
+There is 1 query parameters required for this request.
 
 Example: `api/user/1`
 
@@ -401,7 +402,7 @@ The request body should contain a JSON object with the following properties:
 | ----------- | ------ | ---------------------------------------------------------------------------------------- |
 | name        | string | Required. The name of the product.                                                       |
 | description | string | Required. Product's description .                                                        |
-| sizes       | array  | Required. Includes objects containing the following fields: `sizename, quantity, price`. |
+| sizes       | array  | Required. Includes objects containing the following fields: `sizeName, quantity, price`. |
 | images      | array  | Required. Includes a list of url images.                                                 |
 
 Example request body:
@@ -412,17 +413,17 @@ Example request body:
     "description": "Description.",
     "sizes": [
         {
-            "sizename": "S",
+            "sizeName": "S",
             "quantity": 12,
             "price": 230000
         },
         {
-            "sizename": "M",
+            "sizeName": "M",
             "quantity": 13,
             "price": 235000
         },
         {
-            "sizename": "L",
+            "sizeName": "L",
             "quantity": 6,
             "price": 240000
         }
@@ -494,5 +495,108 @@ Example response body:
     HTTP/1.1 403 Forbidden
     "status": true,
     "message": "Not Authentication"
+}
+```
+
+# Get A Detail Product API
+
+This API allows the user to retrieve detailed information about a product in the platform.
+
+## Request
+
+`GET /api/product/{productId}`
+
+### Headers
+
+| Header | Description |
+| ------ | ----------- |
+|        |             |
+
+### Query parameters
+
+There is 1 query parameters required for this request.
+
+Example: `api/product/321`
+
+## Resonse
+
+### Successful responses
+
+A successful response returns a JSON object with detailed information about the requested product.
+
+#### HTTP Status Code
+
+| Status Code | Description |
+| ----------- | ----------- |
+| 200         | OK.         |
+
+#### Response Body
+
+| Property    | Type    | Description                                            |
+| ----------- | ------- | ------------------------------------------------------ |
+| status      | boolean | Successful or Failed.                                  |
+| productId   | string  | Product ID.                                            |
+| description | string  | Product's description                                  |
+| sizes       | array   | Array containing objects (`sizeName, quantity, price`) |
+
+Example response body:
+
+```json
+{
+    HTTP/1.1 200 OK
+    "status": true,
+    "productId": "23",
+    "name": "T-Shirt --LAM--",
+    "description": "This is a description.",
+    "sizes": [
+        {
+            "sizeName": "L",
+            "quantity": "6",
+            "price": "240000"
+        },
+        {
+            "sizeName": "M",
+            "quantity": "13",
+            "price": "235000"
+        },
+        {
+            "sizeName": "S",
+            "quantity": "12",
+            "price": "230000"
+        }
+    ],
+    "images": [
+        "images link 1",
+        "images link 2",
+        "images link 3",
+        "images link 4",
+        "images link 5"
+    ]
+}
+```
+
+### Error responses
+
+#### HTTP Status Code
+
+| Status Code | Description                                |
+| ----------- | ------------------------------------------ |
+| 400         | Not Found. User does not exist             |
+| 500         | Internal Server Error. Get Prodduct Failed |
+
+#### Response Body
+
+| Property | Type    | Description           |
+| -------- | ------- | --------------------- |
+| status   | boolean | Successful or Failed. |
+| message  | string  | Error message.        |
+
+Example response body:
+
+```json
+{
+    HTTP/1.1 400 Not Found
+    "status": true,
+    "message": "User does not exist"
 }
 ```

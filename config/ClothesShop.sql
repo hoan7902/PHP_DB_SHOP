@@ -25,7 +25,7 @@ CREATE TABLE `Product` (
   `productId` int(11) PRIMARY KEY AUTO_INCREMENT,
   `name` varchar(500),
   `description` text,
-  `deleted` boolean
+  `deleted` boolean DEFAULT 0
 );
 
 CREATE TABLE `Collection` (

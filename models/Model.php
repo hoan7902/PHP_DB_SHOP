@@ -28,9 +28,10 @@ class Model extends Database
         $this->close();
         return $data;
     }
-    public function getBy($keys = [])
+    public function getBy($keys = [], $selects = ['*'])
     {
-        $sql = "SELECT * FROM $this->table WHERE ";
+        $columns = implode(', ', $selects);
+        $sql = "SELECT $columns FROM $this->table WHERE ";
         $where = [];
         foreach ($keys as $key => $value) {
             array_push($where, "$key = '$value' ");

@@ -16,4 +16,8 @@ class ProductModel extends Model
     {
         return $this->delete(['productId' => $productId]);
     }
+    public function getById($productId, $selects)
+    {
+        return $this->getBy(['productId' => $productId], $selects);
+    }
 }

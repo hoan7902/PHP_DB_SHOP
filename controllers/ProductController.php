@@ -2,6 +2,7 @@
 
 require_once('./utils/JWTHelper.php');
 require_once('./utils/RestApi.php');
+require_once('./utils/HandleUri.php');
 require_once('./models/ImageModel.php');
 require_once('./models/SizeModel.php');
 
@@ -27,7 +28,7 @@ class ProductController extends Controller
             }
             $checkSizeDatatype = true;
             foreach ($sizes as $value) {
-                if (!array_key_exists("sizename", $value) || !array_key_exists("quantity", $value) || !array_key_exists("price", $value)) {
+                if (!array_key_exists("sizeName", $value) || !array_key_exists("quantity", $value) || !array_key_exists("price", $value)) {
                     $checkSizeDatatype = false;
                     break;
                 }
@@ -65,14 +66,41 @@ class ProductController extends Controller
             }
         } else if (in_array($role, ['Not Authentication', 'self', 'customer'])) {
             $this->status(403);
-            return $this->response(['status' => false, 'message' => 'Not Authentication']);
+            return $this->response(['status' => false, 'message' => 'Not Au1thentication']);
         } else {
             $this->status(401);
             return $this->response(['status' => false, 'message' => 'Not Authorization']);
         }
     }
 
-    static private function addImages($productId, $imgs)
+    public function getOneProduct()
+    {
+        $params = HandleUri::sliceUri();
+        $productId = $params ? ($params[2] ? $params[2] : null) : null;
+        try {
+            $data = $this->productModel->getById($productId, ['productId', 'name', 'description']);
+            if (count($data) > 0) {
+                $sizeModel = new SizeModel();
+                $imageModel = new ImageModel();
+                $sizes = $sizeModel->getByProductId($productId, ['sizeName', 'quantity', 'price']);
+                $images = $imageModel->getByProductId($productId, ['imageLink']);
+                $images = array_map(function ($image) {
+                    return $image['imageLink'];
+                }, $images);
+                $data = [...$data[0], 'sizes' => $sizes, 'images' => $images];
+                $this->status(200);
+                return $this->response(['status' => true, ...$data]);
+            } else {
+                $this->status(400);
+                return $this->response(['status' => false, 'message' => 'User does not exist']);
+            }
+        } catch (Exception $e) {
+            $this->status(500);
+            return $this->response(['status' => false, 'message' => "Get Prodduct Failed"]);
+        }
+    }
+
+    private function addImages($productId, $imgs)
     {
         if (count($imgs) > 0) {
             $imageModel = new ImageModel();
