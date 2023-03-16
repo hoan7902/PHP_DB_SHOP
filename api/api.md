@@ -404,6 +404,7 @@ The request body should contain a JSON object with the following properties:
 | description | string | Required. Product's description .                                                        |
 | sizes       | array  | Required. Includes objects containing the following fields: `sizeName, quantity, price`. |
 | images      | array  | Required. Includes a list of url images.                                                 |
+| categories  | array  | Optional. Includes a list of integer number which are `categoryId`s.                     |
 
 Example request body:
 
@@ -411,6 +412,7 @@ Example request body:
 {
     "name": "T-Shirt --LAM--",
     "description": "Description.",
+    "categories": [1, 2],
     "sizes": [
         {
             "sizeName": "S",
@@ -532,12 +534,13 @@ A successful response returns a JSON object with detailed information about the 
 
 #### Response Body
 
-| Property    | Type    | Description                                            |
-| ----------- | ------- | ------------------------------------------------------ |
-| status      | boolean | Successful or Failed.                                  |
-| productId   | string  | Product ID.                                            |
-| description | string  | Product's description                                  |
-| sizes       | array   | Array containing objects (`sizeName, quantity, price`) |
+| Property    | Type    | Description                                                |
+| ----------- | ------- | ---------------------------------------------------------- |
+| status      | boolean | Successful or Failed.                                      |
+| productId   | string  | Product ID.                                                |
+| description | string  | Product's description                                      |
+| sizes       | array   | Array containing objects (`sizeName, quantity, price`)     |
+| categories  | array   | Array containing objects (`categoryId, name, description`) |
 
 Example response body:
 
@@ -571,7 +574,19 @@ Example response body:
         "images link 3",
         "images link 4",
         "images link 5"
-    ]
+    ],
+    "categories": [
+    {
+      "categoryId": "1",
+      "name": "Shirt",
+      "description": "Nothing"
+    },
+    {
+      "categoryId": "2",
+      "name": "Pants",
+      "description": "Nothing"
+    }
+  ]
 }
 ```
 
