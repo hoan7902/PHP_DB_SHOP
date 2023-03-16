@@ -5,6 +5,7 @@ require_once('./utils/RestApi.php');
 require_once('./utils/HandleUri.php');
 require_once('./models/ImageModel.php');
 require_once('./models/SizeModel.php');
+require_once('./controllers/ProductsInCategoryController.php');
 
 class ProductController extends Controller
 {
@@ -22,6 +23,7 @@ class ProductController extends Controller
             $desc = RestApi::bodyData('description');
             $sizes = RestApi::bodyData('sizes');
             $imgs = RestApi::bodyData('images');
+            $categories = RestApi::bodyData('categories');
             if (!$name || !$desc || !$sizes || !$imgs) {
                 $this->status(400);
                 return $this->response(['status' => false, 'message' => 'Missing data']);
@@ -43,6 +45,7 @@ class ProductController extends Controller
                 $this->status(400);
                 return $this->response(['status' => false, 'message' => 'Length of name must be in range [12, 500]']);
             }
+            $productId = null;
             try {
                 $res = $this->productModel->insertProduct(['name' => $name, 'description' => $desc]);
                 if ($res) {
@@ -50,19 +53,24 @@ class ProductController extends Controller
                     if (!$this->addImages((int)$productId, $imgs)) {
                         $this->productModel->deleteProduct($productId);
                         $this->status(500);
-                        return $this->response(['status' => false, 'message' => 'Post failed']);
+                        return $this->response(['status' => false, 'message' => 'Post failed with images']);
                     }
                     if (!$this->addSizes((int)$productId, $sizes)) {
                         $this->productModel->deleteProduct($productId);
                         $this->status(500);
-                        return $this->response(['status' => false, 'message' => 'Post failed']);
+                        return $this->response(['status' => false, 'message' => 'Post failed with sizes']);
+                    }
+                    if (is_array($categories) && count($categories) > 0) {
+                        $prodInCat = new ProductsInCategoryController();
+                        $prodInCat->addProductsInCategory($productId, $categories);
                     }
                     $this->status(201);
                     return $this->response(['status' => true, 'message' => 'Post successful']);
                 }
             } catch (Exception $e) {
+                $this->productModel->deleteProduct($productId);
                 $this->status(500);
-                return $this->response(['status' => false, 'message' => 'Post failed']);
+                return $this->response(['status' => false, 'message' => 'Post failed: ' . $e->getMessage()]);
             }
         } else if (in_array($role, ['Not Authentication', 'self', 'customer'])) {
             $this->status(403);

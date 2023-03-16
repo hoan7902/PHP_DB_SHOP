@@ -3,8 +3,6 @@
 require_once('./utils/JWTHelper.php');
 require_once('./utils/RestApi.php');
 require_once('./utils/HandleUri.php');
-require_once('./models/ImageModel.php');
-require_once('./models/SizeModel.php');
 
 class CategoryController extends Controller
 {

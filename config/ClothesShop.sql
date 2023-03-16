@@ -49,7 +49,7 @@ CREATE TABLE `Cart` (
   `time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
-CREATE TABLE `ProductInOrder` (
+CREATE TABLE `ProductsInOrder` (
   `productId` int(11) PRIMARY KEY AUTO_INCREMENT,
   `orderId` int(11)
 );
@@ -105,9 +105,9 @@ ALTER TABLE `Cart` ADD CONSTRAINT `cart_user_fk` FOREIGN KEY (`userId`) REFERENC
 
 ALTER TABLE `Cart` ADD CONSTRAINT `cart_product_fk` FOREIGN KEY (`productId`) REFERENCES `Product` (`productId`) ON DELETE CASCADE;
 
-ALTER TABLE `ProductInOrder` ADD CONSTRAINT `productinorder_product_fk` FOREIGN KEY (`productId`) REFERENCES `Product` (`productId`) ON DELETE CASCADE;
+ALTER TABLE `ProductsInOrder` ADD CONSTRAINT `productinorder_product_fk` FOREIGN KEY (`productId`) REFERENCES `Product` (`productId`) ON DELETE CASCADE;
 
-ALTER TABLE `ProductInOrder` ADD CONSTRAINT `productinorder_order_fk` FOREIGN KEY (`orderId`) REFERENCES `Order` (`orderId`) ON DELETE CASCADE;
+ALTER TABLE `ProductsInOrder` ADD CONSTRAINT `productinorder_order_fk` FOREIGN KEY (`orderId`) REFERENCES `Order` (`orderId`) ON DELETE CASCADE;
 
 ALTER TABLE `UserHaveOrders` ADD CONSTRAINT `userhaveorders_order_fk` FOREIGN KEY (`orderId`) REFERENCES `Order` (`orderId`) ON DELETE CASCADE;
 
