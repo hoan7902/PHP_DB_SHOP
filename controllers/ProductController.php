@@ -92,10 +92,11 @@ class ProductController extends Controller
                 $imageModel = new ImageModel();
                 $sizes = $sizeModel->getByProductId($productId, ['sizeName', 'quantity', 'price']);
                 $images = $imageModel->getByProductId($productId, ['imageLink']);
+                $categories = $this->productModel->getCategoriesOfProduct($productId);
                 $images = array_map(function ($image) {
                     return $image['imageLink'];
                 }, $images);
-                $data = [...$data[0], 'sizes' => $sizes, 'images' => $images];
+                $data = [...$data[0], 'sizes' => $sizes, 'images' => $images, 'categories' => $categories];
                 $this->status(200);
                 return $this->response(['status' => true, ...$data]);
             } else {
@@ -104,7 +105,7 @@ class ProductController extends Controller
             }
         } catch (Exception $e) {
             $this->status(500);
-            return $this->response(['status' => false, 'message' => "Get Prodduct Failed"]);
+            return $this->response(['status' => false, 'message' => "Get Product Failed: " . $e->getMessage()]);
         }
     }
 

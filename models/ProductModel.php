@@ -20,4 +20,16 @@ class ProductModel extends Model
     {
         return $this->getBy(['productId' => $productId], $selects);
     }
+    public function getCategoriesOfProduct($prodcutId)
+    {
+        $sql = "SELECT `Category`.`categoryId`, `Category`.`name`, `Category`.`description` FROM `Category`
+        INNER JOIN `ProductsInCategory` ON `Category`.`categoryId` = `ProductsInCategory`.`categoryId`
+        INNER JOIN `Product` ON `ProductsInCategory`.`productId` = `Product`.`productId` WHERE `ProductsInCategory`.`productId` = $prodcutId;";
+        $query = $this->query($sql);
+        $data = [];
+        while ($row = mysqli_fetch_assoc($query)) {
+            $data[] = $row;
+        }
+        return $data;
+    }
 }
