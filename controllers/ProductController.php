@@ -25,6 +25,17 @@ class ProductController extends Controller
                 $this->status(400);
                 return $this->response(['status' => false, 'message' => 'Missing data']);
             }
+            $checkSizeDatatype = true;
+            foreach ($sizes as $value) {
+                if (!array_key_exists("sizename", $value) || !array_key_exists("quantity", $value) || !array_key_exists("price", $value)) {
+                    $checkSizeDatatype = false;
+                    break;
+                }
+            }
+            if (!$checkSizeDatatype) {
+                $this->status(400);
+                return $this->response(['status' => false, 'message' => 'Data type of sizes is wrong']);
+            }
             $name = trim($name);
             $desc = trim($desc);
             if (strlen($name) < 12 || strlen($name) > 500) {
@@ -37,17 +48,11 @@ class ProductController extends Controller
                     $productId = $this->productModel->getConn()->insert_id;
                     if (!$this->addImages((int)$productId, $imgs)) {
                         $this->productModel->deleteProduct($productId);
-                        $imageModel = new ImageModel();
-                        $imageModel->deleteImages(['productId' => $productId]);
                         $this->status(500);
                         return $this->response(['status' => false, 'message' => 'Post failed']);
                     }
                     if (!$this->addSizes((int)$productId, $sizes)) {
                         $this->productModel->deleteProduct($productId);
-                        $imageModel = new ImageModel();
-                        $imageModel->deleteImages(['productId' => $productId]);
-                        $sizeModel = new SizeModel();
-                        $sizeModel->deleteSizes(['productId' => $productId]);
                         $this->status(500);
                         return $this->response(['status' => false, 'message' => 'Post failed']);
                     }
