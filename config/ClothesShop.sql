@@ -44,7 +44,7 @@ CREATE TABLE `Cart` (
   `cartId` int(11) PRIMARY KEY AUTO_INCREMENT,
   `userId` int(11),
   `productId` int(11),
-  `time` datetime
+  `time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
 CREATE TABLE `ProductInOrder` (
