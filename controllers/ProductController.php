@@ -66,7 +66,7 @@ class ProductController extends Controller
             }
         } else if (in_array($role, ['Not Authentication', 'self', 'customer'])) {
             $this->status(403);
-            return $this->response(['status' => false, 'message' => 'Not Au1thentication']);
+            return $this->response(['status' => false, 'message' => 'Not Authentication']);
         } else {
             $this->status(401);
             return $this->response(['status' => false, 'message' => 'Not Authorization']);
@@ -97,6 +97,38 @@ class ProductController extends Controller
         } catch (Exception $e) {
             $this->status(500);
             return $this->response(['status' => false, 'message' => "Get Prodduct Failed"]);
+        }
+    }
+
+    public function getProducts()
+    {
+        // order_by: [asc, desc]
+        // sort_by: [price, order_count]
+        $orderBy = RestApi::getParams('order_by');
+        $sortBy = RestApi::getParams('sort_by');
+        $categories = RestApi::getParams('categories');
+        $page = RestApi::getParams('page');
+        $maxPrice = RestApi::getParams('max_price');
+        $minPrice = RestApi::getParams('min_price');
+        $collections = RestApi::getParams('collections');
+        if ($orderBy == "desc") {
+            $orderBy = "DESC";
+        } else {
+            $orderBy = "ASC";
+        }
+        $page = $page ? (int)$page : 1;
+        if ($page < 1) $page = 1;
+        $minPrice = $minPrice ? (float)$minPrice : 0.0;
+        if ($minPrice < 0.0) $minPrice = 0.0;
+        $maxPrice = $maxPrice ? (float)$maxPrice : 0.0;
+        if ($maxPrice < 0.0) $maxPrice = null;
+        if ($sortBy == 'price') {
+        } else if ($sortBy == 'order_count') {
+            $sortBy = 'orderCount';
+        } else if ($sortBy == 'created_at') {
+            $sortBy = 'createdAt';
+        } else {
+            $sortBy = 'createdAt';
         }
     }
 

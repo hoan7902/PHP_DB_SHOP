@@ -20,4 +20,12 @@ class RestApi
             return isset($headers[$key]) ? $headers[$key] : null;
         }
     }
+    static public function getParams($key = null)
+    {
+        if (!$key) {
+            return $_GET;
+        } else {
+            return isset($_GET[$key]) ? $_GET[$key] : null;
+        }
+    }
 }

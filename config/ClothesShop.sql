@@ -7,7 +7,8 @@ CREATE TABLE `User` (
   `password` varchar(255),
   `avatar` varchar(500),
   `address` text(500),
-  `role` varchar(10) DEFAULT "customer"
+  `role` varchar(10) DEFAULT "customer",
+  `createdAt` timestamp DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE `Order` (
@@ -25,6 +26,7 @@ CREATE TABLE `Product` (
   `productId` int(11) PRIMARY KEY AUTO_INCREMENT,
   `name` varchar(500),
   `description` text,
+  `createdAt` timestamp DEFAULT CURRENT_TIMESTAMP,
   `deleted` boolean DEFAULT 0
 );
 
@@ -36,7 +38,7 @@ CREATE TABLE `Collection` (
 
 CREATE TABLE `Category` (
   `categoryId` int(11) PRIMARY KEY AUTO_INCREMENT,
-  `name` varchar(500),
+  `name` varchar(500) UNIQUE,
   `description` text
 );
 

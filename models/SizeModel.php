@@ -15,7 +15,7 @@ class SizeModel extends Model
         for ($j = 0; $j < count($sizes); $j++) {
             $data[$j]['productId'] = $productId;
         }
-        return $this->insertMul(['productId', 'sizename', 'price', 'quantity'], $data);
+        return $this->insertMul(['productId', 'sizeName', 'price', 'quantity'], $data);
     }
     public function deleteSizes($keys)
     {
