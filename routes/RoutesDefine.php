@@ -22,4 +22,6 @@ $routes = [
     array('method' => 'POST', 'route' => 'api/category', 'regex' => '/^api\/category\/?$/', 'controller' => "CategoryController", 'action' => "addCategory"),
     // Get a list categories (user)
     array('method' => 'GET', 'route' => 'api/categories', 'regex' => '/^api\/categories\/?$/', 'controller' => "CategoryController", 'action' => "getCategories"),
+    // Remove a product out of category
+    array('method' => 'PUT', 'route' => 'api/product/removepoc', 'regex' => '/^api\/product\/removepoc\/?$/', 'controller' => "ProductsInCategoryController", 'action' => "removeProductOutOfCat")
 ];

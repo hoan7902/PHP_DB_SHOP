@@ -62,7 +62,7 @@ class ProductController extends Controller
                     }
                     if (is_array($categories) && count($categories) > 0) {
                         $prodInCat = new ProductsInCategoryController();
-                        $prodInCat->addProductsInCategory($productId, $categories);
+                        $prodInCat->addProductInCat($productId, $categories);
                     }
                     $this->status(201);
                     return $this->response(['status' => true, 'message' => 'Post successful']);

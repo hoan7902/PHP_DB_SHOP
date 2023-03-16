@@ -16,4 +16,9 @@ class ProductsInCategoryModel extends Model
         }
         return $this->insertMul(['productId', 'categoryId'], $data);
     }
+    public function deleteProductsInCategory($productId, $categoryId)
+    {
+        $keys = ['productId' => $productId, 'categoryId' => $categoryId];
+        return $this->delete($keys);
+    }
 }
