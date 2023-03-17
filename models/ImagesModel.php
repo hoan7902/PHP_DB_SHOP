@@ -2,12 +2,12 @@
 
 require_once("./models/Model.php");
 
-class ImageModel extends Model
+class ImagesModel extends Model
 {
     protected $table;
     public function __construct()
     {
-        $this->table = "Image";
+        $this->table = "Images";
     }
     public function insertImages($productId, $imgs)
     {

@@ -1,12 +1,12 @@
 <?php
 require_once('./models/Model.php');
 
-class ProductsInCategoryModel extends Model
+class ProductsInCategoriesModel extends Model
 {
     protected $table;
     public function __construct()
     {
-        $this->table = 'ProductsInCategory';
+        $this->table = 'ProductsInCategories';
     }
     public function insertProductsInCategory($productId, $categories)
     {

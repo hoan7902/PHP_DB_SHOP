@@ -2,9 +2,9 @@
 
 require_once("./models/Model.php");
 
-class UserModel extends Model
+class UsersModel extends Model
 {
-    protected $table = 'User';
+    protected $table = 'Users';
 
     public function insertUser($arrayData)
     {

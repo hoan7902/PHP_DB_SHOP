@@ -2,12 +2,12 @@
 
 require_once('./models/Model.php');
 
-class SizeModel extends Model
+class SizesModel extends Model
 {
     protected $table;
     public function __construct()
     {
-        $this->table = "Size";
+        $this->table = "Sizes";
     }
     public function insertSizes($productId, $sizes)
     {

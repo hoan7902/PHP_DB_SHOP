@@ -1,7 +1,7 @@
 <?php
 require_once "JWT.php";
 require_once "./config/Const.php";
-require_once "./models/UserModel.php";
+require_once "./models/UsersModel.php";
 
 
 function genToken($payload, $expiresIn = '30d')
@@ -51,13 +51,13 @@ function authHeader($authHeader, $checkId = null)
     } else {
         return "Not Authorization";
     }
-    $userModel = new UserModel();
+    $usersModel = new UsersModel();
     if (verifyToken($token)) {
         $payload = decodeToken($token);
         $id = $payload["userId"] ? $payload['userId'] : null;
         if ($id) {
             try {
-                $user = $userModel->getUserById($id);
+                $user = $usersModel->getUserById($id);
                 if ($user) {
                     if ($user['role'] == 'admin') {
                         return "admin";

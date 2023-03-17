@@ -615,3 +615,15 @@ Example response body:
     "message": "User does not exist"
 }
 ```
+
+# Remove Product Out Of Category API
+
+...
+
+# Create A Category API
+
+...
+
+# Get Categories API
+
+...

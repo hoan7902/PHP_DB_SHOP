@@ -1,15 +1,15 @@
 <?php
 
 require_once('./utils/JWTHelper.php');
-require_once('./models/ProductsInCategoryModel.php');
+require_once('./models/ProductsInCategoriesModel.php');
 require_once('./utils/RestApi.php');
 
-class ProductsInCategoryController extends Controller
+class ProductsInCategoriesController extends Controller
 {
     private $productsInOrderModel;
     public function __construct()
     {
-        $this->productsInOrderModel = $this->model('ProductsInCategoryModel');
+        $this->productsInOrderModel = $this->model('ProductsInCategoriesModel');
     }
     public function addProductInCat($productId, $categories)
     {

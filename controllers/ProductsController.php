@@ -3,16 +3,16 @@
 require_once('./utils/JWTHelper.php');
 require_once('./utils/RestApi.php');
 require_once('./utils/HandleUri.php');
-require_once('./models/ImageModel.php');
-require_once('./models/SizeModel.php');
-require_once('./controllers/ProductsInCategoryController.php');
+require_once('./models/ImagesModel.php');
+require_once('./models/SizesModel.php');
+require_once('./controllers/ProductsInCategoriesController.php');
 
-class ProductController extends Controller
+class ProductsController extends Controller
 {
-    private $productModel;
+    private $productsModel;
     public function __construct()
     {
-        $this->productModel = $this->model("ProductModel");
+        $this->productsModel = $this->model("ProductsModel");
     }
     public function addProduct()
     {
@@ -47,28 +47,28 @@ class ProductController extends Controller
             }
             $productId = null;
             try {
-                $res = $this->productModel->insertProduct(['name' => $name, 'description' => $desc]);
+                $res = $this->productsModel->insertProduct(['name' => $name, 'description' => $desc]);
                 if ($res) {
-                    $productId = $this->productModel->getConn()->insert_id;
+                    $productId = $this->productsModel->getConn()->insert_id;
                     if (!$this->addImages((int)$productId, $imgs)) {
-                        $this->productModel->deleteProduct($productId);
+                        $this->productsModel->deleteProduct($productId);
                         $this->status(500);
                         return $this->response(['status' => false, 'message' => 'Post failed with images']);
                     }
                     if (!$this->addSizes((int)$productId, $sizes)) {
-                        $this->productModel->deleteProduct($productId);
+                        $this->productsModel->deleteProduct($productId);
                         $this->status(500);
                         return $this->response(['status' => false, 'message' => 'Post failed with sizes']);
                     }
                     if (is_array($categories) && count($categories) > 0) {
-                        $prodInCat = new ProductsInCategoryController();
+                        $prodInCat = new ProductsInCategoriesController();
                         $prodInCat->addProductInCat($productId, $categories);
                     }
                     $this->status(201);
                     return $this->response(['status' => true, 'message' => 'Post successful']);
                 }
             } catch (Exception $e) {
-                $this->productModel->deleteProduct($productId);
+                $this->productsModel->deleteProduct($productId);
                 $this->status(500);
                 return $this->response(['status' => false, 'message' => 'Post failed: ' . $e->getMessage()]);
             }
@@ -86,13 +86,13 @@ class ProductController extends Controller
         $params = HandleUri::sliceUri();
         $productId = $params ? ($params[2] ? $params[2] : null) : null;
         try {
-            $data = $this->productModel->getById($productId, ['productId', 'name', 'description']);
+            $data = $this->productsModel->getById($productId, ['productId', 'name', 'description']);
             if (count($data) > 0) {
-                $sizeModel = new SizeModel();
-                $imageModel = new ImageModel();
-                $sizes = $sizeModel->getByProductId($productId, ['sizeName', 'quantity', 'price']);
-                $images = $imageModel->getByProductId($productId, ['imageLink']);
-                $categories = $this->productModel->getCategoriesOfProduct($productId);
+                $sizesModel = new SizesModel();
+                $imagesModel = new ImagesModel();
+                $sizes = $sizesModel->getByProductId($productId, ['sizeName', 'quantity', 'price']);
+                $images = $imagesModel->getByProductId($productId, ['imageLink']);
+                $categories = $this->productsModel->getCategoriesOfProduct($productId);
                 $images = array_map(function ($image) {
                     return $image['imageLink'];
                 }, $images);
@@ -101,7 +101,7 @@ class ProductController extends Controller
                 return $this->response(['status' => true, ...$data]);
             } else {
                 $this->status(400);
-                return $this->response(['status' => false, 'message' => 'User does not exist']);
+                return $this->response(['status' => false, 'message' => 'Product does not exist']);
             }
         } catch (Exception $e) {
             $this->status(500);
@@ -120,32 +120,52 @@ class ProductController extends Controller
         $maxPrice = RestApi::getParams('max_price');
         $minPrice = RestApi::getParams('min_price');
         $collections = RestApi::getParams('collections');
-        if ($orderBy == "desc") {
-            $orderBy = "DESC";
+        $limit = RestApi::getParams('limit');
+        /* sort_by: Theo giá -> Hai chiều + order_by
+        sort_by: Bán chạy -> 1 chiều -> order_by: Desc
+        Kết hợp với min_price, max_price, $collections
+        Mặc định: Danh sách theo thời gian -> Mới nhất lấy trước.
+         */
+        if ($orderBy == 'asc') {
+            $orderBy = 'ASC';
         } else {
-            $orderBy = "ASC";
+            $orderBy = 'DESC';
         }
-        $page = $page ? (int)$page : 1;
-        if ($page < 1) $page = 1;
-        $minPrice = $minPrice ? (float)$minPrice : 0.0;
-        if ($minPrice < 0.0) $minPrice = 0.0;
-        $maxPrice = $maxPrice ? (float)$maxPrice : 0.0;
-        if ($maxPrice < 0.0) $maxPrice = null;
         if ($sortBy == 'price') {
         } else if ($sortBy == 'order_count') {
-            $sortBy = 'orderCount';
-        } else if ($sortBy == 'created_at') {
-            $sortBy = 'createdAt';
         } else {
-            $sortBy = 'createdAt';
+            $sortBy = 'time';
         }
+        if ($page) {
+            $page = (int)$page < 1 ? 1 : (int)$page;
+        } else {
+            $page = 1;
+        }
+        if ($limit) {
+            $limit = (int)$limit < 1 ? 24 : (int)$limit;
+        } else {
+            $limit = 24;
+        }
+        if ($minPrice) {
+            $minPrice = (int)$minPrice < 0 ? 0 : (int)$minPrice;
+        }
+        if ($maxPrice) {
+            $maxPrice = (int)$maxPrice < 0 ? 3e38 : (int)$maxPrice;
+        }
+        if ($categories) {
+            $categories = explode('%C2', $categories);
+        }
+        if ($collections) {
+            $collections = explode('%C2', $collections);
+        }
+        $data = $this->productsModel->getProducts($sortBy, $orderBy, $limit, $page, $minPrice, $maxPrice, $categories, $collections);
     }
 
     private function addImages($productId, $imgs)
     {
         if (count($imgs) > 0) {
-            $imageModel = new ImageModel();
-            $res = $imageModel->insertImages($productId, $imgs);
+            $imagesModel = new ImagesModel();
+            $res = $imagesModel->insertImages($productId, $imgs);
             if ($res) return true;
         }
         return false;
@@ -153,9 +173,9 @@ class ProductController extends Controller
 
     private function addSizes($productId, $sizes)
     {
-        $sizeModel = new SizeModel();
+        $sizesModel = new SizesModel();
         try {
-            if ($sizeModel->insertSizes($productId, $sizes))
+            if ($sizesModel->insertSizes($productId, $sizes))
                 return true;
         } catch (Exception $e) {
             return false;

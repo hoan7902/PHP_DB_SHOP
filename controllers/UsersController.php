@@ -7,12 +7,12 @@ require_once("./utils/PasswordHelper.php");
 require_once("./utils/JWTHelper.php");
 require_once("./utils/HandleUri.php");
 
-class UserController extends Controller
+class UsersController extends Controller
 {
-    private $userModel;
+    private $usersModel;
     public function __construct()
     {
-        $this->userModel = $this->model("UserModel");
+        $this->usersModel = $this->model("UsersModel");
     }
 
     public function login()
@@ -32,7 +32,7 @@ class UserController extends Controller
             return $this->response(["status" => false, "message" => $e->getMessage()]);
         }
         try {
-            $user = $this->userModel->getUserByEmail($email);
+            $user = $this->usersModel->getUserByEmail($email);
             if ($user) {
                 if (verifyPassword($password, $user['password'])) {
                     $this->status(200);
@@ -73,7 +73,7 @@ class UserController extends Controller
         $password = hashPassword($password);
         try {
 
-            $this->userModel->insertUser(['name' => $name, 'email' => $email, 'password' => $password]);
+            $this->usersModel->insertUser(['name' => $name, 'email' => $email, 'password' => $password]);
             $this->status(201);
             return $this->response(["status" => true]);
         } catch (Exception $e) {
@@ -90,7 +90,7 @@ class UserController extends Controller
         $authHeader = $restAPI->headerData('Authorization');
         $role = authHeader($authHeader, $params[2]);
         if ($role == 'admin' || $role == "self") {
-            $user = $this->userModel->getUserById($params[2]);
+            $user = $this->usersModel->getUserById($params[2]);
             if ($user) {
                 $this->status(200);
                 $data = array("userId" => $user['userId'], "name" => $user["name"], "phone" => $user['phone'], "sex" => $user['sex'], "email" => $user['email'], "avatar" => $user['avatar'], "address" => $user['address']);
@@ -116,7 +116,7 @@ class UserController extends Controller
         $authHeader = $restAPI->headerData('Authorization');
         $role = authHeader($authHeader);
         if ($role == 'admin') {
-            $users = $this->userModel->getNRecords(['userId', 'name', 'phone', 'sex', 'email', 'avatar', 'address', 'role'], [], ['userId'], $frame);
+            $users = $this->usersModel->getNRecords(['userId', 'name', 'phone', 'sex', 'email', 'avatar', 'address', 'role'], [], ['userId'], $frame);
             $this->status(200);
             return $this->response(["status" => true, "users" => $users]);
         } else if ($role == 'Not Authorization') {
@@ -195,7 +195,7 @@ class UserController extends Controller
                 $this->status(400);
                 return $this->response(['status' => false, 'message' => 'Nothing changes']);
             }
-            if ($this->userModel->updateOne(['userId' => $userId], $data)) {
+            if ($this->usersModel->updateOne(['userId' => $userId], $data)) {
                 $this->status(200);
                 return $this->response(['status' => true, 'message' => 'Update successful']);
             } else {
@@ -204,10 +204,10 @@ class UserController extends Controller
             }
         } else if ($role == 'Not Authentication') {
             $this->status(401);
-            return $this->response(['status' => false, 'message' => 'Not Authorization']);
+            return $this->response(['status' => false, 'message' => 'Not Authentication']);
         } else {
             $this->status(403);
-            return $this->response(['status' => false, 'message' => 'Not Authentication']);
+            return $this->response(['status' => false, 'message' => 'Not Authorization']);
         }
     }
 

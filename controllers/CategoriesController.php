@@ -4,12 +4,12 @@ require_once('./utils/JWTHelper.php');
 require_once('./utils/RestApi.php');
 require_once('./utils/HandleUri.php');
 
-class CategoryController extends Controller
+class CategoriesController extends Controller
 {
     private $categoryModel;
     public function __construct()
     {
-        $this->categoryModel = $this->model('CategoryModel');
+        $this->categoryModel = $this->model('CategoriesModel');
     }
     public function addCategory()
     {
