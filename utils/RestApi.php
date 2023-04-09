@@ -11,6 +11,14 @@ class RestApi
             return isset(json_decode($requestBody, true)[$key]) ? json_decode($requestBody, true)[$key] : null;
         }
     }
+    static public function formData($key = null)
+    {
+        if (!$key) {
+            return $_POST;
+        } else {
+            return isset($_POST[$key]) ? $_POST[$key] : null;
+        }
+    }
     static public function headerData($key = null)
     {
         $headers = getallheaders();

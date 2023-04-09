@@ -5,6 +5,9 @@ class FirebaseStorageUploader
     static public function uploadImage($image)
     {
         try {
+            if (!$image) {
+                throw new Exception("Image is not valid");
+            }
             $imageType = $image['type'];
             if (
                 !($imageType == 'image/jpeg' || $imageType == 'image/png' || $imageType == 'image/bmp')

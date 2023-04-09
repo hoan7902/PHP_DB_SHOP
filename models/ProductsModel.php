@@ -16,9 +16,16 @@ class ProductsModel extends Model
     {
         return $this->delete(['productId' => $productId]);
     }
-    public function getById($productId, $selects)
+    public function deleteByHideProduct($prodcutId)
     {
-        return $this->getBy(['productId' => $productId], $selects);
+        return $this->updateOne(['productId' => $prodcutId], ['deleted' => 1]);
+    }
+    public function getById($productId, $selects, $deleted = false)
+    {
+        if ($deleted) {
+            return $this->getBy(['productId' => $productId], $selects);
+        }
+        return $this->getBy(['productId' => $productId, 'deleted' => 0], $selects);
     }
     public function getCategoriesOfProduct($prodcutId)
     {
@@ -34,15 +41,7 @@ class ProductsModel extends Model
     }
     public function getProducts($sortBy, $orderBy, $limit, $page, $minPrice, $maxPrice, $categories, $collections)
     {
-        if ($sortBy == 'price') {
-            $sql = "SELECT Product.productId, Product.createdAt, Product.name, Product.description, MIN(Size.price) as minPrice FROM Size
-            INNER JOIN Product ON Size.productId = Product.productId
-            INNER JOIN Productsincategory ON Productsincategory.productId = Product.productId
-            WHERE Product.deleted = 0
-            GROUP BY product.productId
-            ORDER BY minPrice $orderBy";
-        } else if ($sortBy == 'order_count') {
-        } else {
-        }
+        $sql = "SELECT Products.productId, Products.createdAt, Products.name, Products.description, MIN(Sizes.price) as minPrice, MAX(Sizes.price) as maxPrice FROM Sizes INNER JOIN Products ON Sizes.productId = Products.productId INNER JOIN Productsincategories ON Productsincategories.productId = Products.productId WHERE Products.deleted = 0 GROUP BY products.productId ORDER BY minPrice ASC";
+        return false;
     }
 }

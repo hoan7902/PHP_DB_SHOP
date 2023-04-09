@@ -6,6 +6,7 @@ require_once('./utils/HandleUri.php');
 require_once('./models/ImagesModel.php');
 require_once('./models/SizesModel.php');
 require_once('./controllers/ProductsInCategoriesController.php');
+require_once('./utils/FirebaseImageUploader.php');
 
 class ProductsController extends Controller
 {
@@ -19,18 +20,24 @@ class ProductsController extends Controller
         $authHeader = RestApi::headerData('Authorization');
         $role = authHeader($authHeader);
         if ($role == 'admin') {
-            $name = RestApi::bodyData('name');
-            $desc = RestApi::bodyData('description');
-            $sizes = RestApi::bodyData('sizes');
-            $imgs = RestApi::bodyData('images');
-            $categories = RestApi::bodyData('categories');
+            $name = RestApi::formData('name');
+            $desc = RestApi::formData('description');
+            $sizes = RestApi::formData('sizes');
+            $imgs = RestApi::fileData('images');
+            $categories = RestApi::formData('categories');
+            if ($sizes != null) {
+                $sizes = json_decode($sizes);
+            }
+            if ($categories != null) {
+                $categories = json_decode($categories);
+            }
             if (!$name || !$desc || !$sizes || !$imgs) {
                 $this->status(400);
                 return $this->response(['status' => false, 'message' => 'Missing data']);
             }
             $checkSizeDatatype = true;
             foreach ($sizes as $value) {
-                if (!array_key_exists("sizeName", $value) || !array_key_exists("quantity", $value) || !array_key_exists("price", $value)) {
+                if (!property_exists($value, "sizeName") || !property_exists($value, "quantity") || !property_exists($value, "price")) {
                     $checkSizeDatatype = false;
                     break;
                 }
@@ -47,10 +54,11 @@ class ProductsController extends Controller
             }
             $productId = null;
             try {
+                $imgUrls = FirebaseStorageUploader::uploadImages($imgs);
                 $res = $this->productsModel->insertProduct(['name' => $name, 'description' => $desc]);
                 if ($res) {
                     $productId = $this->productsModel->getConn()->insert_id;
-                    if (!$this->addImages((int)$productId, $imgs)) {
+                    if (!$this->addImages((int)$productId, $imgUrls)) {
                         $this->productsModel->deleteProduct($productId);
                         $this->status(500);
                         return $this->response(['status' => false, 'message' => 'Post failed with images']);
@@ -72,12 +80,12 @@ class ProductsController extends Controller
                 $this->status(500);
                 return $this->response(['status' => false, 'message' => 'Post failed: ' . $e->getMessage()]);
             }
-        } else if (in_array($role, ['Not Authentication', 'self', 'customer'])) {
+        } else if (in_array($role, ['Not Authenticated', 'self', 'customer'])) {
             $this->status(403);
-            return $this->response(['status' => false, 'message' => 'Not Authentication']);
+            return $this->response(['status' => false, 'message' => 'Not Authenticated']);
         } else {
             $this->status(401);
-            return $this->response(['status' => false, 'message' => 'Not Authorization']);
+            return $this->response(['status' => false, 'message' => 'Not Authorized']);
         }
     }
 
@@ -106,6 +114,20 @@ class ProductsController extends Controller
         } catch (Exception $e) {
             $this->status(500);
             return $this->response(['status' => false, 'message' => "Get Product Failed: " . $e->getMessage()]);
+        }
+    }
+
+    public function deleteOneProduct()
+    {
+        $params = HandleUri::sliceUri();
+        $productId = $params ? ($params[2] ? $params[2] : null) : null;
+        try {
+            $this->productsModel->deleteByHideProduct($productId);
+            $this->status(204);
+            return;
+        } catch (Exception $e) {
+            $this->status(400);
+            return $this->response(['status' => false, 'message' => $e->getMessage()]);
         }
     }
 

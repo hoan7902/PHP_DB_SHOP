@@ -11,9 +11,14 @@ class SizesModel extends Model
     }
     public function insertSizes($productId, $sizes)
     {
-        $data = $sizes;
+        $data = [];
+
         for ($j = 0; $j < count($sizes); $j++) {
-            $data[$j]['productId'] = $productId;
+            if (is_object($sizes[$j])) {
+                array_push($data, ['productId' => $productId, 'quantity' => $sizes[$j]->quantity, 'price' => $sizes[$j]->price, 'sizeName' => $sizes[$j]->sizeName]);
+            } else {
+                array_push($data, ['productId' => $productId, 'quantity' => $sizes[$j]['quantity'], 'price' => $sizes[$j]['price'], 'sizeName' => $sizes[$j]['sizeName']]);
+            }
         }
         return $this->insertMul(['productId', 'sizeName', 'price', 'quantity'], $data);
     }

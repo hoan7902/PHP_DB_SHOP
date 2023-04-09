@@ -5,6 +5,7 @@
 -   [Get Users API](#get-users-api)
 -   [Get User By ID API](#get-user-by-id-api)
 -   [Update Profile API](#update-profile-api)
+-   [Update Profile Image API](#update-profile-image-api)
 -   [Upload A Product API](#upload-a-product-api)
 -   [Get A Detail Product API](#get-a-detail-product-api)
 
@@ -204,8 +205,8 @@ Example response body:
 
 | Status Code | Description                     |
 | ----------- | ------------------------------- |
-| 401         | Unauthorized. Not Authorization |
-| 403         | Forbidden. Not Authentication   |
+| 401         | Unauthorized. Not Authenticated |
+| 403         | Forbidden. Not Authorized       |
 
 #### Response Body
 
@@ -220,7 +221,7 @@ Example response body:
 {
     HTTP/1.1 401 Unauthorized
     "status": true,
-    "message": "Not Authorization"
+    "message": "Not Authenticated"
 }
 ```
 
@@ -288,8 +289,8 @@ Example response body:
 
 | Status Code | Description                     |
 | ----------- | ------------------------------- |
-| 401         | Unauthorized. Not Authorization |
-| 403         | Forbidden. Not Authentication   |
+| 401         | Unauthorized. Not Authenticated |
+| 403         | Forbidden. Not Authorized       |
 | 404         | Not Found. User is not valid    |
 
 #### Response Body
@@ -358,8 +359,61 @@ If the request is successful, the server will respond with a JSON object contain
 | ----------- | ---------------------------------------------- |
 | 200         | OK. Update successfully.                       |
 | 400         | Bad Request. Update failed with error message. |
-| 401         | Unauthorized. Not Authorization                |
-| 403         | Forbidden. Not Authentication                  |
+| 401         | Unauthorized. Not Authenticated                |
+| 403         | Forbidden. Not Authorized                      |
+| 500         | Internal Server Error. Update failed           |
+
+### Body
+
+| Property | Type    | Description           |
+| -------- | ------- | --------------------- |
+| status   | boolean | Successful or Failed. |
+| message  | string  | Just a message :vv.   |
+
+Example response body:
+
+```json
+{
+    HTTP/1.1 200 OK
+    "status": true,
+    "message": "Update successful"
+}
+```
+
+# Update Profile Image API
+
+This API is used to update avatar.
+
+## Request
+
+`POST /api/user/avatar`
+
+### Headers
+
+| Header        | Description                        |
+| ------------- | ---------------------------------- |
+| Authorization | Required. Set to `Bearer <token>`. |
+
+### Body
+
+The request body should contain a file with field `avatar` in the form:
+
+| Property | Type | Description           |
+| -------- | ---- | --------------------- |
+| avatar   | file | Required. Image file. |
+
+## Resonse
+
+If the request is successful, the server will respond with a JSON object containing a status (true or false) and a message.
+
+### HTTP Status Codes
+
+| Status Code | Description                                    |
+| ----------- | ---------------------------------------------- |
+| 200         | OK. Update successfully.                       |
+| 400         | Bad Request. Update failed with error message. |
+| 401         | Unauthorized. Not Authenticated                |
+| 403         | Forbidden. Not Authorized                      |
 | 500         | Internal Server Error. Update failed           |
 
 ### Body
@@ -389,57 +443,22 @@ This API allows admin to create a new product.
 
 ### Headers
 
-| Header        | Description                          |
-| ------------- | ------------------------------------ |
-| Content-Type  | Required. Set to `application/json`. |
-| Authorization | Required. Set to `Bearer <token>`.   |
+| Header        | Description                             |
+| ------------- | --------------------------------------- |
+| Content-Type  | Required. Set to `multipart/form-data`. |
+| Authorization | Required. Set to `Bearer <token>`.      |
 
 ### Body
 
 The request body should contain a JSON object with the following properties:
 
-| Property    | Type   | Description                                                                              |
-| ----------- | ------ | ---------------------------------------------------------------------------------------- |
-| name        | string | Required. The name of the product.                                                       |
-| description | string | Required. Product's description .                                                        |
-| sizes       | array  | Required. Includes objects containing the following fields: `sizeName, quantity, price`. |
-| images      | array  | Required. Includes a list of url images.                                                 |
-| categories  | array  | Optional. Includes a list of integer number which are `categoryId`s.                     |
-
-Example request body:
-
-```json
-{
-    "name": "T-Shirt --LAM--",
-    "description": "Description.",
-    "categories": [1, 2],
-    "sizes": [
-        {
-            "sizeName": "S",
-            "quantity": 12,
-            "price": 230000
-        },
-        {
-            "sizeName": "M",
-            "quantity": 13,
-            "price": 235000
-        },
-        {
-            "sizeName": "L",
-            "quantity": 6,
-            "price": 240000
-        }
-    ],
-    "images": [
-        "image url 1",
-        "image url 2",
-        "image url 3",
-        "image url 4",
-        "image url 5",
-        "image url 6"
-    ]
-}
-```
+| Property    | Type   | Description                                                                                         |
+| ----------- | ------ | --------------------------------------------------------------------------------------------------- |
+| name        | string | Required. The name of the product.                                                                  |
+| description | string | Required. Product's description .                                                                   |
+| sizes       | array  | Required. JSON TYPE. Includes objects containing the following fields: `sizeName, quantity, price`. |
+| images      | array  | Required. FILES. Includes image files.                                                              |
+| categories  | array  | Optional. Includes a list of integer number which are `categoryId`s.                                |
 
 ## Resonse
 
@@ -479,8 +498,8 @@ Example response body:
 | Status Code | Description                        |
 | ----------- | ---------------------------------- |
 | 400         | Bad Request. Throw message error   |
-| 401         | Unauthorized. Not Authorization    |
-| 403         | Forbidden. Not Authentication      |
+| 401         | Unauthorized. Not Authenticated    |
+| 403         | Forbidden. Not Authorized          |
 | 500         | Internal Server Error. Post failed |
 
 #### Response Body
@@ -496,7 +515,7 @@ Example response body:
 {
     HTTP/1.1 403 Forbidden
     "status": true,
-    "message": "Not Authentication"
+    "message": "Not Authorized"
 }
 ```
 

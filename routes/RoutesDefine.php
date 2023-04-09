@@ -18,6 +18,8 @@ $routes = [
     array('method' => 'POST', 'route' => 'api/product/add', 'regex' => '/^api\/product\/add\/?$/', 'controller' => 'ProductsController', 'action' => 'addProduct'),
     // Get a product (user)
     array('method' => 'GET', 'route' => 'api/product/{productId}', 'regex' => '/^api\/product\/[0-9]+\/?$/', 'controller' => 'ProductsController', 'action' => 'getOneProduct'),
+    // Delete a product (admin)
+    array('method' => 'DELETE', 'route' => 'api/product/{productId}', 'regex' => '/^api\/product\/[0-9]+\/?$/', 'controller' => 'ProductsController', 'action' => 'deleteOneProduct'),
     // Get a list product (user)
     array('method' => 'GET', 'route' => 'api/products/{frame}', 'regex' => '/^api\/products\/?$/', 'controller' => "ProductsController", 'action' => "getProducts"),
     // Create a category (admin)
