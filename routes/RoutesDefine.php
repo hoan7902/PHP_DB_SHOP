@@ -12,6 +12,8 @@ $routes = [
     array('method' => 'GET', 'route' => 'api/users/{frame}', 'regex' => '/^api\/users(\/|\/[0-9]+)?$/', 'controller' => "UsersController", 'action' => "getUsers"),
     // Update user's profile (self)
     array('method' => 'PUT', 'route' => 'api/user/profile', 'regex' => '/^api\/user\/profile\/?$/', 'controller' => 'UsersController', 'action' => 'updateProfile'),
+    // Update profile image (self)
+    array('method' => 'POST', 'route' => 'api/user/avatar', 'regex' => '/^api\/user\/avatar\/?$/', 'controller' => 'UsersController', 'action' => 'updateAvatar'),
     // Post a product (admin)
     array('method' => 'POST', 'route' => 'api/product/add', 'regex' => '/^api\/product\/add\/?$/', 'controller' => 'ProductsController', 'action' => 'addProduct'),
     // Get a product (user)
@@ -23,5 +25,5 @@ $routes = [
     // Get a list categories (user)
     array('method' => 'GET', 'route' => 'api/categories', 'regex' => '/^api\/categories\/?$/', 'controller' => "CategoriesController", 'action' => "getCategories"),
     // Remove a product out of category
-    array('method' => 'PUT', 'route' => 'api/product/removepoc', 'regex' => '/^api\/product\/removepoc\/?$/', 'controller' => "ProductsInCategoriesController", 'action' => "removeProductOutOfCat")
+    array('method' => 'PUT', 'route' => 'api/product/removepoc', 'regex' => '/^api\/product\/removepoc\/?$/', 'controller' => "ProductsInCategoriesController", 'action' => "removeProductOutOfCat"),
 ];

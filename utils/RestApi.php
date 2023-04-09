@@ -28,4 +28,12 @@ class RestApi
             return isset($_GET[$key]) ? $_GET[$key] : null;
         }
     }
+    static public function fileData($key = null)
+    {
+        if (!$key) {
+            return $_FILES;
+        } else {
+            return isset($_FILES[$key]) ? $_FILES[$key] : null;
+        }
+    }
 }

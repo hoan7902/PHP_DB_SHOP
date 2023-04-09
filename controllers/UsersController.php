@@ -1,11 +1,10 @@
 <?php
 
-use function PHPSTORM_META\type;
-
 require_once("./utils/RestApi.php");
 require_once("./utils/PasswordHelper.php");
 require_once("./utils/JWTHelper.php");
 require_once("./utils/HandleUri.php");
+require_once("./utils/FirebaseImageUploader.php");
 
 class UsersController extends Controller
 {
@@ -36,7 +35,7 @@ class UsersController extends Controller
             if ($user) {
                 if (verifyPassword($password, $user['password'])) {
                     $this->status(200);
-                    return $this->response(['status' => true, 'token' => genToken(["userId" => $user['userId'], "role" => $user['role']])]);
+                    return $this->response(['status' => true, 'token' => genToken(["userId" => $user['userId'], "role" => $user['role']]), 'role' => $user['role']]);
                 } else {
                     $this->status(400);
                     return $this->response(['status' => false, 'message' => "Login failed!"]);
@@ -101,10 +100,10 @@ class UsersController extends Controller
             }
         } else if ($role == 'Not Authorization') {
             $this->status(401);
-            return $this->response(["status" => false, 'message' => "Not Authorization"]);
+            return $this->response(["status" => false, 'message' => "Not Authenticated"]);
         } else {
             $this->status(403);
-            return $this->response(["status" => false, 'message' => "Not Authentication"]);
+            return $this->response(["status" => false, 'message' => "Not Authorized"]);
         }
     }
 
@@ -119,12 +118,12 @@ class UsersController extends Controller
             $users = $this->usersModel->getNRecords(['userId', 'name', 'phone', 'sex', 'email', 'avatar', 'address', 'role'], [], ['userId'], $frame);
             $this->status(200);
             return $this->response(["status" => true, "users" => $users]);
-        } else if ($role == 'Not Authorization') {
+        } else if ($role == 'Not Authenticated') {
             $this->status(401);
-            return $this->response(["status" => false, 'message' => "Not Authorization"]);
+            return $this->response(["status" => false, 'message' => "Not Authenticated"]);
         } else {
             $this->status(403);
-            return $this->response(["status" => false, 'message' => "Not Authentication"]);
+            return $this->response(["status" => false, 'message' => "Not Authorized"]);
         }
     }
 
@@ -137,7 +136,7 @@ class UsersController extends Controller
             $userId = $payload['userId'];
         } catch (Exception $e) {
             $this->status(401);
-            return $this->response(['status' => false, 'message' => 'Not Authentication']);
+            return $this->response(['status' => false, 'message' => 'Not Authenticated']);
         }
         $role = authHeader($authHeader, $userId);
         if ($role == 'admin' || $role == 'self') {
@@ -145,7 +144,7 @@ class UsersController extends Controller
             $phone = RestApi::bodyData('phone');
             $sex = RestApi::bodyData('sex');
             $address = RestApi::bodyData('address');
-            $avatar = RestApi::bodyData('avatar');
+            // $avatar = RestApi::bodyData('avatar');
             $data = [];
             if ($name != null) {
                 try {
@@ -183,31 +182,71 @@ class UsersController extends Controller
                     $data['address'] = $address;
                 }
             }
-            if ($avatar != null) {
-                $avatar = trim($avatar);
-                if ($avatar == '') {
-                    $avatar = null;
-                } else {
-                    $data['avatar'] = $avatar;
-                }
-            }
-            if (!$name && !$phone && !$sex && !$address && !$avatar) {
+            // if ($avatar != null) {
+            //     $avatar = trim($avatar);
+            //     if ($avatar == '') {
+            //         $avatar = null;
+            //     } else {
+            //         $data['avatar'] = $avatar;
+            //     }
+            // }
+            if (!$name && !$phone && !$sex && !$address /* && !$avatar */) {
                 $this->status(400);
                 return $this->response(['status' => false, 'message' => 'Nothing changes']);
             }
             if ($this->usersModel->updateOne(['userId' => $userId], $data)) {
                 $this->status(200);
-                return $this->response(['status' => true, 'message' => 'Update successful']);
+                return $this->response(['status' => true, 'message' => 'Update successfully']);
             } else {
                 $this->status(500);
                 return $this->response(['status' => false, 'message' => 'Update failed']);
             }
-        } else if ($role == 'Not Authentication') {
+        } else if ($role == 'Not Authenticated') {
             $this->status(401);
-            return $this->response(['status' => false, 'message' => 'Not Authentication']);
+            return $this->response(['status' => false, 'message' => 'Not Authenticated']);
         } else {
             $this->status(403);
-            return $this->response(['status' => false, 'message' => 'Not Authorization']);
+            return $this->response(['status' => false, 'message' => 'Not Authorized']);
+        }
+    }
+
+    public function updateAvatar()
+    {
+        $authHeader = RestApi::headerData("Authorization");
+        $token = getTokenFromAuthHeader($authHeader);
+        try {
+            $payload = decodeToken($token);
+            $userId = $payload['userId'];
+        } catch (Exception $e) {
+            $this->status(401);
+            return $this->response(['status' => false, 'message' => 'Not Authenticated']);
+        }
+        $role = authHeader($authHeader, $userId);
+        if ($role == 'admin' || $role == 'self') {
+            try {
+                $avatar = RestApi::fileData('avatar');
+                $imageUrl = FirebaseStorageUploader::uploadImage($avatar);
+                if ($avatar == null) {
+                    $this->status(200);
+                    return $this->response(['status' => false, 'message' => 'Nothing Changes']);
+                }
+                if ($this->usersModel->updateOne(['userId' => $userId], ['avatar' => $imageUrl])) {
+                    $this->status(200);
+                    return $this->response(['status' => true, 'message' => 'Update successfully']);
+                } else {
+                    $this->status(400);
+                    return $this->response(['status' => true, 'message' => 'Update failed']);
+                }
+            } catch (Exception $e) {
+                $this->status(400);
+                return $this->response(['status' => false, 'message' => $e->getMessage()]);
+            }
+        } else if ($role == 'Not Authenticated') {
+            $this->status(401);
+            return $this->response(['status' => false, 'message' => 'Not Authenticated']);
+        } else {
+            $this->status(403);
+            return $this->response(['status' => false, 'message' => 'Not Authorized']);
         }
     }
 

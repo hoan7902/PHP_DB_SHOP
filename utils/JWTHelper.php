@@ -49,7 +49,7 @@ function authHeader($authHeader, $checkId = null)
         $authHeaderArr = explode(" ", $authHeader);
         $token = $authHeaderArr[1];
     } else {
-        return "Not Authorization";
+        return "Not Authenticated";
     }
     $usersModel = new UsersModel();
     if (verifyToken($token)) {
@@ -71,9 +71,9 @@ function authHeader($authHeader, $checkId = null)
                 return "Wrong token " . $e->getMessage();
             }
         }
-        return "Not Authentication";
+        return "Not Authenticated";
     } else {
-        return "Not Authorization";
+        return "Not Authenticated";
     }
 }
 function getTokenFromAuthHeader($authHeader)
