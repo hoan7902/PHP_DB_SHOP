@@ -133,8 +133,6 @@ class ProductsController extends Controller
 
     public function getProducts()
     {
-        // order_by: [asc, desc]
-        // sort_by: [price, order_count]
         $orderBy = RestApi::getParams('order_by');
         $sortBy = RestApi::getParams('sort_by');
         $categories = RestApi::getParams('categories');
@@ -143,11 +141,6 @@ class ProductsController extends Controller
         $minPrice = RestApi::getParams('min_price');
         $collections = RestApi::getParams('collections');
         $limit = RestApi::getParams('limit');
-        /* sort_by: Theo giá -> Hai chiều + order_by
-        sort_by: Bán chạy -> 1 chiều -> order_by: Desc
-        Kết hợp với min_price, max_price, $collections
-        Mặc định: Danh sách theo thời gian -> Mới nhất lấy trước.
-         */
         if ($orderBy == 'asc') {
             $orderBy = 'ASC';
         } else {
@@ -156,7 +149,7 @@ class ProductsController extends Controller
         if ($sortBy == 'price') {
         } else if ($sortBy == 'order_count') {
         } else {
-            $sortBy = 'time';
+            $sortBy = 'createdAt';
         }
         if ($page) {
             $page = (int)$page < 1 ? 1 : (int)$page;
@@ -164,16 +157,12 @@ class ProductsController extends Controller
             $page = 1;
         }
         if ($limit) {
-            $limit = (int)$limit < 1 ? 24 : (int)$limit;
+            $limit = (int)$limit < 0 ? 24 : (int)$limit;
         } else {
             $limit = 24;
         }
-        if ($minPrice) {
-            $minPrice = (int)$minPrice < 0 ? 0 : (int)$minPrice;
-        }
-        if ($maxPrice) {
-            $maxPrice = (int)$maxPrice < 0 ? 3e38 : (int)$maxPrice;
-        }
+        $minPrice = $minPrice ? ((int)$minPrice < 0 ? 0 : (int)$minPrice) : 0;
+        $maxPrice = $maxPrice ? ((int)$maxPrice < 0 ? 3e38 : (int)$maxPrice) : 3e38;
         if ($categories) {
             $categories = explode('%C2', $categories);
         }
@@ -181,6 +170,18 @@ class ProductsController extends Controller
             $collections = explode('%C2', $collections);
         }
         $data = $this->productsModel->getProducts($sortBy, $orderBy, $limit, $page, $minPrice, $maxPrice, $categories, $collections);
+        if (count($data) > 0) {
+            $imagesModel = new ImagesModel();
+            for ($i = 0; $i < count($data); $i++) {
+                $images = $imagesModel->getImages($data[$i]['productId']);
+                $data[$i]['images'] = [];
+                foreach ($images as $key => $img) {
+                    array_push($data[$i]['images'], $img['imageLink']);
+                }
+            }
+        }
+        $this->status(200);
+        return $this->response($data);
     }
 
     private function addImages($productId, $imgs)

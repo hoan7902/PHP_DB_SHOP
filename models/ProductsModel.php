@@ -41,7 +41,72 @@ class ProductsModel extends Model
     }
     public function getProducts($sortBy, $orderBy, $limit, $page, $minPrice, $maxPrice, $categories, $collections)
     {
-        $sql = "SELECT Products.productId, Products.createdAt, Products.name, Products.description, MIN(Sizes.price) as minPrice, MAX(Sizes.price) as maxPrice FROM Sizes INNER JOIN Products ON Sizes.productId = Products.productId INNER JOIN Productsincategories ON Productsincategories.productId = Products.productId WHERE Products.deleted = 0 GROUP BY products.productId ORDER BY minPrice ASC";
-        return false;
+        if ($sortBy == 'price' && $orderBy == 'asc') {
+            $sortBy = 'minPrice';
+        } else if ($sortBy == 'price' && $orderBy == 'desc') {
+            $sortBy = 'maxPrice';
+        }
+        if (is_array($categories) && count($categories) > 0) {
+            $catsString = "(" . implode(", ", $categories) . ")";
+        } else {
+            $catsString = "()";
+        }
+        $offset = ($page - 1) * $limit;
+        if ($catsString == '()') {
+            $sql = "
+            SELECT 
+                Products.productId, 
+                Products.createdAt, 
+                Products.name,
+                Products.description, 
+                MIN(Sizes.price) as minPrice, 
+                MAX(Sizes.price) as maxPrice
+            FROM 
+                Sizes 
+                INNER JOIN Products ON Sizes.productId = Products.productId 
+                INNER JOIN ProductsInCategories ON ProductsInCategories.productId = Products.productId
+            WHERE 
+                Products.deleted = 0 
+            GROUP BY 
+                products.productId
+            HAVING 
+                minPrice >= {$minPrice} AND maxPrice <= {$maxPrice}
+            ORDER BY 
+                {$sortBy} {$orderBy}
+            LIMIT {$limit}
+            OFFSET {$offset};
+            ";
+        } else {
+            $sql = "
+            SELECT 
+                Products.productId, 
+                Products.createdAt, 
+                Products.name,
+                Products.description, 
+                MIN(Sizes.price) as minPrice, 
+                MAX(Sizes.price) as maxPrice
+            FROM 
+                Sizes 
+                INNER JOIN Products ON Sizes.productId = Products.productId 
+                INNER JOIN ProductsInCategories ON ProductsInCategories.productId = Products.productId
+            WHERE 
+                Products.deleted = 0
+                AND ProductsInCategories.categoryId in {$catsString}
+            GROUP BY 
+                products.productId
+            HAVING 
+                minPrice >= {$minPrice} AND maxPrice <= {$maxPrice}
+            ORDER BY 
+                minPrice ASC
+            LIMIT {$limit}
+            OFFSET {$offset};
+            ";
+        }
+        $query = $this->query($sql);
+        $data = [];
+        while ($row = mysqli_fetch_assoc($query)) {
+            array_push($data, $row);
+        }
+        return $data;
     }
 }

@@ -134,7 +134,7 @@ This API allows admin to get information about users on the platform.
 
 ## Request
 
-`GET /api/users/{frame}`
+`GET /api/users`
 
 ### Headers
 
@@ -145,9 +145,14 @@ This API allows admin to get information about users on the platform.
 
 ### Query parameters
 
-| Parameters | Data Type | Description             |
-| ---------- | --------- | ----------------------- |
-| frame      | integer   | Optional. Default is 1. |
+| Parameters | Data Type | Description              |
+| ---------- | --------- | ------------------------ |
+| frame      | integer   | Optional. Default is 1.  |
+| limit      | integer   | Optional. Default is 24. |
+
+example:
+
+`GET /api/users?limit=12&frame=2`
 
 ## Resonse
 
@@ -235,10 +240,9 @@ This API allows admin/self to get an information about one user on the platform.
 
 ### Headers
 
-| Header        | Description                          |
-| ------------- | ------------------------------------ |
-| Content-Type  | Required. Set to `application/json`. |
-| Authorization | Required. Set to `Bearer <token>`.   |
+| Header        | Description                        |
+| ------------- | ---------------------------------- |
+| Authorization | Required. Set to `Bearer <token>`. |
 
 ### Query parameters
 

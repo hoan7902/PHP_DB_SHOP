@@ -25,7 +25,6 @@ class Model extends Database
         while ($row = mysqli_fetch_assoc($query)) {
             array_push($data, $row);
         }
-        $this->close();
         return $data;
     }
     public function getBy($keys = [], $selects = ['*'])
@@ -100,7 +99,6 @@ class Model extends Database
         while ($row = mysqli_fetch_assoc($query)) {
             array_push($data, $row);
         }
-        $this->close();
         return $data;
     }
     public function updateOne(array $condition, array $data)
@@ -123,9 +121,9 @@ class Model extends Database
         $sql = "UPDATE $this->table $setStr $whereStr ;";
         $query = $this->query($sql);
         if ($query) {
-            return true;
+            return mysqli_affected_rows($this->conn);
         }
-        return false;
+        return 0;
     }
     public function delete($keys)
     {
@@ -135,7 +133,8 @@ class Model extends Database
         }
         $whereStr = implode('AND ', $whereArr);
         $sql = "DELETE FROM $this->table WHERE $whereStr ;";
-        return $this->query($sql);
+        $query = $this->query($sql);
+        return $query;
     }
     public function getConn()
     {

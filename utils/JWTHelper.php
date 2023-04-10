@@ -76,6 +76,17 @@ function authHeader($authHeader, $checkId = null)
         return "Not Authenticated";
     }
 }
+// Check token before use this function
+function getUserId($authHeader)
+{
+    $token = getTokenFromAuthHeader($authHeader);
+    if (verifyToken($token)) {
+        $payload = decodeToken($token);
+        $id = $payload["userId"] ? $payload['userId'] : null;
+        return $id;
+    }
+    return null;
+}
 function getTokenFromAuthHeader($authHeader)
 {
     $token = null;

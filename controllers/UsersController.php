@@ -109,13 +109,15 @@ class UsersController extends Controller
 
     public function getUsers()
     {
-        $params = HandleUri::sliceUri();
-        $frame = $params[2] ? (int)$params[2] : 1;
+        $limit = RestApi::getParams('limit');
+        $limit = $limit ? ((int)$limit > 0 ? (int)$limit : 24) : 24;
+        $frame = RestApi::getParams('frame');
+        $limit = $limit ? ((int)$limit > 0 ? (int)$limit : 1) : 1;
         $restAPI = new RestApi();
         $authHeader = $restAPI->headerData('Authorization');
         $role = authHeader($authHeader);
         if ($role == 'admin') {
-            $users = $this->usersModel->getNRecords(['userId', 'name', 'phone', 'sex', 'email', 'avatar', 'address', 'role'], [], ['userId'], $frame);
+            $users = $this->usersModel->getNRecords(['userId', 'name', 'phone', 'sex', 'email', 'avatar', 'address', 'role'], [], ['userId'], $frame, $limit);
             $this->status(200);
             return $this->response(["status" => true, "users" => $users]);
         } else if ($role == 'Not Authenticated') {

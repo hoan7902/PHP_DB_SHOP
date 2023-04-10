@@ -14,6 +14,7 @@ $routes = [
     array('method' => 'PUT', 'route' => 'api/user/profile', 'regex' => '/^api\/user\/profile\/?$/', 'controller' => 'UsersController', 'action' => 'updateProfile'),
     // Update profile image (self)
     array('method' => 'POST', 'route' => 'api/user/avatar', 'regex' => '/^api\/user\/avatar\/?$/', 'controller' => 'UsersController', 'action' => 'updateAvatar'),
+
     // Post a product (admin)
     array('method' => 'POST', 'route' => 'api/product/add', 'regex' => '/^api\/product\/add\/?$/', 'controller' => 'ProductsController', 'action' => 'addProduct'),
     // Get a product (user)
@@ -28,4 +29,9 @@ $routes = [
     array('method' => 'GET', 'route' => 'api/categories', 'regex' => '/^api\/categories\/?$/', 'controller' => "CategoriesController", 'action' => "getCategories"),
     // Remove a product out of category
     array('method' => 'PUT', 'route' => 'api/product/removepoc', 'regex' => '/^api\/product\/removepoc\/?$/', 'controller' => "ProductsInCategoriesController", 'action' => "removeProductOutOfCat"),
+
+    // Create An Order (customer)
+    array('method' => 'POST', 'route' => 'api/order/create', 'regex' => '/^api\/order\/create\/?$/', 'controller' => 'OrdersController', 'action' => 'createAnOrder'),
+    // Update status of order (admin)
+    array('method' => 'PUT', 'route' => 'api/order/update-status', 'regex' => '/^api\/order\/update-status\/?$/', 'controller' => 'OrdersController', 'action' => 'updateStatusOrder'),
 ];

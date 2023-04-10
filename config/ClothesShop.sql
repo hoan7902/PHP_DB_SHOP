@@ -13,12 +13,12 @@ CREATE TABLE `Users` (
 
 CREATE TABLE `Orders` (
   `orderId` int(11) PRIMARY KEY AUTO_INCREMENT,
-  `status` ENUM('Pending','Accepted','Shipping','Done') DEFAULT NULL,
+  `status` ENUM('Pending','Accepted','Shipping','Done') DEFAULT 'Pending',
   `phone` varchar(20),
   `cost` float,
   `note` varchar(255),
   `address` text(500),
-  `orderTime` datetime,
+  `orderTime` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `deliveryTime` datetime
 );
 
@@ -50,12 +50,15 @@ CREATE TABLE `Carts` (
 );
 
 CREATE TABLE `ProductsInOrders` (
-  `productId` int(11) PRIMARY KEY AUTO_INCREMENT,
-  `orderId` int(11)
+  `productId` int(11),
+  `orderId` int(11),
+  `size` varchar(10),
+  `quantity` int(11),
+  PRIMARY KEY(`productId`, `orderId`, `size`)
 );
 
 CREATE TABLE `UsersHaveOrders` (
-  `orderId` int(11) PRIMARY KEY AUTO_INCREMENT,
+  `orderId` int(11) PRIMARY KEY,
   `userId` int(11)
 );
 

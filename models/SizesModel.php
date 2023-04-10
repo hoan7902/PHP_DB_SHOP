@@ -30,4 +30,12 @@ class SizesModel extends Model
     {
         return $this->getBy(['productId' => $productId], $selects);
     }
+    public function getSize($productId, $sizeName, $selects = ['*'])
+    {
+        return $this->getBy(['productId' => $productId, 'sizeName' => $sizeName], $selects);
+    }
+    public function updateQuantity($productId, $sizeName, $quantity)
+    {
+        return $this->updateOne(['productId' => $productId, 'sizeName' => $sizeName], ['quantity' => $quantity]);
+    }
 }

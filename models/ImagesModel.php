@@ -31,4 +31,8 @@ class ImagesModel extends Model
     {
         return $this->getBy(['productId' => $productId], $selects);
     }
+    public function getImages($productId)
+    {
+        return $this->getBy(['productId' => $productId]);
+    }
 }
