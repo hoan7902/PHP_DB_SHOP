@@ -80,12 +80,129 @@ class ProductsController extends Controller
                 $this->status(500);
                 return $this->response(['status' => false, 'message' => 'Post failed: ' . $e->getMessage()]);
             }
-        } else if (in_array($role, ['Not Authenticated', 'self', 'customer'])) {
+        } else if (in_array($role, ['self', 'customer'])) {
             $this->status(403);
-            return $this->response(['status' => false, 'message' => 'Not Authenticated']);
+            return $this->response(['status' => false, 'message' => 'Not Authorized']);
         } else {
             $this->status(401);
+            return $this->response(['status' => false, 'message' => 'Not Authenticated']);
+        }
+    }
+
+    public function updateProduct()
+    {
+        $authHeader = RestApi::headerData('Authorization');
+        $role = authHeader($authHeader);
+        if ($role == 'admin') {
+            $productId = RestApi::formData('productId');
+            $name = RestApi::formData('name');
+            $desc = RestApi::formData('description');
+            $sizes = RestApi::formData('sizes');
+            $imgs = RestApi::fileData('images');
+            $categories = RestApi::formData('categories');
+            if ($productId) {
+                $product = $this->productsModel->getById($productId, ['*']);
+                if (count($product) != 1) {
+                    $this->status(400);
+                    return $this->response(['status' => false, 'message' => 'Product is not exist']);
+                }
+            } else {
+                $this->status(400);
+                return $this->response(['status' => false, 'message' => 'Missing ProductId']);
+            }
+            $newProduct = [];
+            $updateSizes = false;
+            $updateImages = false;
+            $updateCats = false;
+            if ($sizes != null) {
+                $sizes = json_decode($sizes);
+                $updateSizes = true;
+            }
+            if ($categories != null && !is_array($categories)) {
+                $categories = json_decode($categories);
+            }
+            if ($categories) {
+                $updateCats = true;
+            }
+            if ($imgs != null) {
+                $updateImages = true;
+            }
+            $name = trim($name);
+            $desc = trim($desc);
+            if ($name != null) {
+                if (strlen($name) < 12 || strlen($name) > 500) {
+                    $this->status(400);
+                    return $this->response(['status' => false, 'message' => 'Length of name must be in range [12, 500]']);
+                }
+                $newProduct['name'] = $name;
+            }
+            if ($desc != null) {
+                $newProduct['description'] = $desc;
+            }
+            $checkSizeDatatype = true;
+            if ($updateSizes) {
+                foreach ($sizes as $value) {
+                    if (!property_exists($value, "sizeName") || !property_exists($value, "quantity") || !property_exists($value, "price")) {
+                        $checkSizeDatatype = false;
+                        break;
+                    }
+                }
+                if (!$checkSizeDatatype) {
+                    $this->status(400);
+                    return $this->response(['status' => false, 'message' => 'Data type of sizes is wrong']);
+                }
+            }
+            try {
+                if ($updateImages) {
+                    $imagesModel = new ImagesModel();
+                    // Hold old images
+                    $oldImgs = $imagesModel->getImages($productId);
+                    // Delete old images
+                    $imagesModel->deleteImages(['productId' => $productId]);
+                    // Upload new images
+                    $imgUrls = FirebaseStorageUploader::uploadImages($imgs);
+                    // Reinsert images
+                    if (!$this->addImages($productId, $imgUrls)) {
+                        $oldImgsLink = [];
+                        foreach ($oldImgs as $key => $value) {
+                            array_push($oldImgsLink, $value['imageLink']);
+                        }
+                        $this->addImages($productId, $oldImgsLink);
+                        $this->status(400);
+                        return $this->response(['status' => false, 'message' => 'Update failed']);
+                    }
+                }
+                if ($updateCats && is_array($categories) && count($categories) > 0) {
+                    $productsInCategoriesModel = new ProductsInCategoriesModel();
+                    // Hold old categories
+                    $oldCategories = $productsInCategoriesModel->getCatsOfProduct($productId);
+                    // Delete old categories
+                    $productsInCategoriesModel->deleteAllCatsOfProduct($productId);
+                    // Update new categories
+                    $productsInCategoriesModel->insertProductsInCategory($productId, $categories);
+                }
+                if ($updateSizes) {
+                    $sizesModel = new SizesModel();
+                    // Delete old sizes
+                    $sizesModel->deleteSizes(['productId' => $productId]);
+                    // Update new sizes
+                    $this->addSizes((int)$productId, $sizes);
+                }
+                // Update product
+                $this->productsModel->updateOne(['productId' => $productId], $newProduct);
+                $this->status(200);
+                return $this->response(['status' => true, 'message' => 'Update successfully']);
+            } catch (Exception $e) {
+                $this->productsModel->deleteProduct($productId);
+                $this->status(500);
+                return $this->response(['status' => false, 'message' => 'Post failed: ' . $e->getMessage()]);
+            }
+        } else if (in_array($role, ['self', 'customer'])) {
+            $this->status(403);
             return $this->response(['status' => false, 'message' => 'Not Authorized']);
+        } else {
+            $this->status(401);
+            return $this->response(['status' => false, 'message' => 'Not Authenticated']);
         }
     }
 

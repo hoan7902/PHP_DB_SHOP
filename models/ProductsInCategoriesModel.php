@@ -21,4 +21,12 @@ class ProductsInCategoriesModel extends Model
         $keys = ['productId' => $productId, 'categoryId' => $categoryId];
         return $this->delete($keys);
     }
+    public function deleteAllCatsOfProduct($productId)
+    {
+        return $this->delete(['productId' => $productId]);
+    }
+    public function getCatsOfProduct($productId)
+    {
+        return $this->getBy(['productId' => $productId]);
+    }
 }
