@@ -12,7 +12,11 @@ class Controller
     {
         $headers = array(
             'Content-Type: application/json',
-            'Cache-Control: no-cache, must-revalidate'
+            'Access-Control-Allow-Origin: *',
+            'Access-Control-Allow-Headers: *',
+            'Access-Control-Allow-Methods: GET, POST, PUT, DELETE',
+            'Access-Control-Allow-Headers: Content-Type, Authorization',
+            'Access-Control-Allow-Credentials: *'
         );
         foreach ($headers as $header) {
             header($header);
@@ -22,5 +26,6 @@ class Controller
     public function status($code)
     {
         header('HTTP/1.1 ' . $code);
+        // http_response_code($code);
     }
 }
