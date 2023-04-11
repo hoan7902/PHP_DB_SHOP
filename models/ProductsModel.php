@@ -53,53 +53,59 @@ class ProductsModel extends Model
         }
         $offset = ($page - 1) * $limit;
         if ($catsString == '()') {
-            $sql = "
-            SELECT 
-                Products.productId, 
-                Products.createdAt, 
-                Products.name,
-                Products.description, 
-                MIN(Sizes.price) as minPrice, 
-                MAX(Sizes.price) as maxPrice
-            FROM 
-                Sizes 
-                INNER JOIN Products ON Sizes.productId = Products.productId 
-                INNER JOIN ProductsInCategories ON ProductsInCategories.productId = Products.productId
-            WHERE 
-                Products.deleted = 0 
-            GROUP BY 
-                products.productId
-            HAVING 
-                minPrice >= {$minPrice} AND maxPrice <= {$maxPrice}
-            ORDER BY 
-                {$sortBy} {$orderBy}
-            LIMIT {$limit}
-            OFFSET {$offset};
-            ";
+            $catsString = "";
         } else {
+            $catsString = "AND ProductsInCategories.categoryId IN {$catsString}";
+        }
+        if (in_array($sortBy, ['minPrice', 'maxPrice', 'createdAt'])) {
             $sql = "
-            SELECT 
-                Products.productId, 
-                Products.createdAt, 
-                Products.name,
-                Products.description, 
-                MIN(Sizes.price) as minPrice, 
-                MAX(Sizes.price) as maxPrice
-            FROM 
-                Sizes 
-                INNER JOIN Products ON Sizes.productId = Products.productId 
-                INNER JOIN ProductsInCategories ON ProductsInCategories.productId = Products.productId
-            WHERE 
-                Products.deleted = 0
-                AND ProductsInCategories.categoryId in {$catsString}
-            GROUP BY 
-                products.productId
-            HAVING 
-                minPrice >= {$minPrice} AND maxPrice <= {$maxPrice}
-            ORDER BY 
-                minPrice ASC
-            LIMIT {$limit}
-            OFFSET {$offset};
+                SELECT 
+                    Products.productId, 
+                    Products.createdAt, 
+                    Products.name,
+                    Products.description, 
+                    MIN(Sizes.price) as minPrice, 
+                    MAX(Sizes.price) as maxPrice,
+                    COALESCE(SUM(DISTINCT po.quantity), 0) AS soldQuantity
+                FROM 
+                    Sizes 
+                    INNER JOIN Products ON Sizes.productId = Products.productId 
+                    INNER JOIN ProductsInCategories ON ProductsInCategories.productId = Products.productId
+                    LEFT JOIN (SELECT productId, SUM(quantity) AS quantity FROM ProductsInOrders GROUP BY productId) po ON Products.productId = po.productId
+                WHERE 
+                    Products.deleted = 0
+                    {$catsString}
+                GROUP BY 
+                    products.productId
+                HAVING 
+                    minPrice >= {$minPrice} AND maxPrice <= {$maxPrice}
+                ORDER BY 
+                    {$sortBy} {$orderBy}
+                LIMIT {$limit}
+                OFFSET {$offset};
+                ";
+        } else if (in_array($sortBy, ['orderCount'])) {
+            $sql = "
+                SELECT 
+                    p.productId, 
+                    p.createdAt, 
+                    p.name,
+                    p.description, 
+                    MIN(s.price) as minPrice, 
+                    MAX(s.price) as maxPrice,
+                    COALESCE(SUM(DISTINCT po.quantity), 0) AS soldQuantity
+                FROM products p
+                    LEFT JOIN (SELECT productId, SUM(quantity) AS quantity FROM ProductsInOrders GROUP BY productId) po ON p.productId = po.productId
+                    INNER JOIN sizes s ON s.productId = p.productId
+                    INNER JOIN ProductsInCategories pc ON pc.productId = p.productId
+                WHERE 
+                    p.deleted = 0 
+                    {$catsString}
+                GROUP BY p.productId
+                HAVING minPrice >= {$minPrice} AND maxPrice <= {$maxPrice}
+                ORDER BY `soldQuantity` {$orderBy}
+                LIMIT {$limit}
+                OFFSET {$offset};
             ";
         }
         $query = $this->query($sql);

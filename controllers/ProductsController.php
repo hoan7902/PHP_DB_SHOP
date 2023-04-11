@@ -148,6 +148,7 @@ class ProductsController extends Controller
         }
         if ($sortBy == 'price') {
         } else if ($sortBy == 'order_count') {
+            $sortBy = 'orderCount';
         } else {
             $sortBy = 'createdAt';
         }
