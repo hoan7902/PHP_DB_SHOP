@@ -35,7 +35,7 @@ class UsersController extends Controller
             if ($user) {
                 if (verifyPassword($password, $user['password'])) {
                     $this->status(200);
-                    return $this->response(['status' => true, 'token' => genToken(["userId" => $user['userId'], "role" => $user['role']]), 'role' => $user['role']]);
+                    return $this->response(['status' => true, 'token' => genToken(["userId" => $user['userId'], "role" => $user['role']]), 'data' => ['name' => $user['name'], 'email' => $user['email'], 'role' => $user['role'], 'avatar' => $user['avatar']]]);
                 } else {
                     $this->status(400);
                     return $this->response(['status' => false, 'message' => "Login failed!"]);
@@ -73,8 +73,9 @@ class UsersController extends Controller
         try {
 
             $this->usersModel->insertUser(['name' => $name, 'email' => $email, 'password' => $password]);
+            $user = $this->usersModel->getUserByEmail($email);
             $this->status(201);
-            return $this->response(["status" => true]);
+            return $this->response(['status' => true, 'token' => genToken(["userId" => $user['userId'], "role" => $user['role']]), 'data' => ['name' => $user['name'], 'email' => $user['email'], 'role' => $user['role'], 'avatar' => $user['avatar']]]);
         } catch (Exception $e) {
             $this->status(400);
             return $this->response(['status' => false, 'message' => $e->getMessage()]);
@@ -196,12 +197,17 @@ class UsersController extends Controller
                 $this->status(400);
                 return $this->response(['status' => false, 'message' => 'Nothing changes']);
             }
-            if ($this->usersModel->updateOne(['userId' => $userId], $data)) {
-                $this->status(200);
-                return $this->response(['status' => true, 'message' => 'Update successfully']);
-            } else {
-                $this->status(500);
-                return $this->response(['status' => false, 'message' => 'Update failed']);
+            try {
+                if ($this->usersModel->updateOne(['userId' => $userId], $data)) {
+                    $this->status(200);
+                    return $this->response(['status' => true, 'message' => 'Update successfully']);
+                } else {
+                    $this->status(500);
+                    return $this->response(['status' => false, 'message' => 'Update failed']);
+                }
+            } catch (Exception $e) {
+                $this->status(400);
+                return $this->response(['status' => false, 'message' => $e->getMessage()]);
             }
         } else if ($role == 'Not Authenticated') {
             $this->status(401);

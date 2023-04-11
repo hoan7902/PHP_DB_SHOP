@@ -2,6 +2,7 @@
 
 $routes = [
     // Role: admin - self - customer - user
+
     // Login (user)
     array('method' => 'POST', 'route' => 'api/user/login', 'regex' => '/^api\/user\/login\/?$/', 'controller' => 'UsersController', 'action' => 'login'),
     // Register (user)
@@ -23,6 +24,7 @@ $routes = [
     array('method' => 'DELETE', 'route' => 'api/product/{productId}', 'regex' => '/^api\/product\/[0-9]+\/?$/', 'controller' => 'ProductsController', 'action' => 'deleteOneProduct'),
     // Get a list product (user)
     array('method' => 'GET', 'route' => 'api/products/{frame}', 'regex' => '/^api\/products\/?$/', 'controller' => "ProductsController", 'action' => "getProducts"),
+
     // Create a category (admin)
     array('method' => 'POST', 'route' => 'api/category', 'regex' => '/^api\/category\/?$/', 'controller' => "CategoriesController", 'action' => "addCategory"),
     // Get a list categories (user)

@@ -1,7 +1,7 @@
 CREATE TABLE `Users` (
   `userId` int(11) PRIMARY KEY AUTO_INCREMENT,
   `name` varchar(255),
-  `phone` varchar(20),
+  `phone` varchar(20) UNIQUE,
   `sex` varchar(10),
   `email` varchar(100) UNIQUE,
   `password` varchar(255),

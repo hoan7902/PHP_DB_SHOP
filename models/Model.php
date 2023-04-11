@@ -103,27 +103,31 @@ class Model extends Database
     }
     public function updateOne(array $condition, array $data)
     {
-        $whereArr = [];
-        $changeArr = [];
-        foreach ($condition as $key => $value) {
-            array_push($whereArr, "$key = '$value' ");
+        try {
+            $whereArr = [];
+            $changeArr = [];
+            foreach ($condition as $key => $value) {
+                array_push($whereArr, "$key = '$value' ");
+            }
+            foreach ($data as $key => $value) {
+                array_push($changeArr, "$key = '$value' ");
+            }
+            $whereStr = implode("AND ", $whereArr);
+            $whereStr = $whereStr != "" ? "WHERE " . $whereStr : "";
+            $setStr = implode(", ", $changeArr);
+            $setStr = $setStr != "" ? "SET " . $setStr : "";
+            if ($whereStr == "" || $setStr == "") {
+                return false;
+            }
+            $sql = "UPDATE $this->table $setStr $whereStr ;";
+            $query = $this->query($sql);
+            if ($query) {
+                return mysqli_affected_rows($this->conn);
+            }
+            return 0;
+        } catch (Exception $e) {
+            throw new Exception($e->getMessage());
         }
-        foreach ($data as $key => $value) {
-            array_push($changeArr, "$key = '$value' ");
-        }
-        $whereStr = implode("AND ", $whereArr);
-        $whereStr = $whereStr != "" ? "WHERE " . $whereStr : "";
-        $setStr = implode(", ", $changeArr);
-        $setStr = $setStr != "" ? "SET " . $setStr : "";
-        if ($whereStr == "" || $setStr == "") {
-            return false;
-        }
-        $sql = "UPDATE $this->table $setStr $whereStr ;";
-        $query = $this->query($sql);
-        if ($query) {
-            return mysqli_affected_rows($this->conn);
-        }
-        return 0;
     }
     public function delete($keys)
     {

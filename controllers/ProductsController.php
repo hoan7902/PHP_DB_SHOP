@@ -28,7 +28,7 @@ class ProductsController extends Controller
             if ($sizes != null) {
                 $sizes = json_decode($sizes);
             }
-            if ($categories != null) {
+            if ($categories != null && !is_array($categories)) {
                 $categories = json_decode($categories);
             }
             if (!$name || !$desc || !$sizes || !$imgs) {
