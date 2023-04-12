@@ -15,6 +15,7 @@ class OrdersController extends Controller
     }
     public function createAnOrder()
     {
+        return $this->response(['status' => false, 'message' => 'test']);
         $authHeader = RestApi::headerData('Authorization');
         $role = authHeader($authHeader);
         if (in_array($role, ['admin', 'customer'])) {
@@ -102,7 +103,8 @@ class OrdersController extends Controller
             $this->status(401);
             return $this->response(['status' => false, 'message' => 'You have to login before order']);
         }
-        return;
+        $this->status(400);
+        return $this->response(['status' => false, 'message' => 'Failed']);
     }
 
     public function updateStatusOrder()
@@ -117,7 +119,11 @@ class OrdersController extends Controller
                 $this->status(400);
                 return $this->response(['status' => false, 'message' => 'Status is invalid']);
             }
-            $query = $this->ordersModel->updateStatus($orderId, $status);
+            $done = false;
+            if ($status == 'Done') {
+                $done = true;
+            }
+            $query = $this->ordersModel->updateStatus($orderId, $status, $done);
             if ($query > 0) {
                 $this->status(200);
                 return $this->response(['status' => true, 'message' => 'Update successfully']);
@@ -132,6 +138,103 @@ class OrdersController extends Controller
             $this->status(401);
             return $this->response(['status' => false, 'message' => 'Not Authenticated']);
         }
+    }
+
+    public function myOrders()
+    {
+        $authHeader = RestApi::headerData('Authorization');
+        $role = authHeader($authHeader);
+        if (in_array($role, ['customer', 'admin', 'self'])) {
+            try {
+                $userId = getUserId($authHeader);
+                $limit = RestApi::getParams('limit');
+                $frame = RestApi::getParams('frame');
+                $status = RestApi::getParams('status');
+                $orderBy = RestApi::getParams('order_by');
+                $statusArr = explode(",", $status);
+                $listStt = [];
+                if (is_array($statusArr) && count($statusArr) > 0) {
+                    foreach ($statusArr as $stt) {
+                        if ($stt == 'pending') {
+                            array_push($listStt, 'Pending');
+                        } else if ($stt == 'accepted') {
+                            array_push($listStt, 'Accepted');
+                        } else if ($stt == 'shipping') {
+                            array_push($listStt, 'Shipping');
+                        } else if ($stt == 'done') {
+                            array_push($listStt, 'Done');
+                        }
+                    }
+                }
+                $orderBy = $orderBy == 'asc' ? 'ASC' : 'DESC';
+                $limit = $limit ? ((int)$limit > 0 ? (int)$limit : 12) : 12;
+                $frame = $frame ? ((int)$frame > 0 ? (int)$frame : 1) : 1;
+                $data = $this->ordersModel->getOrders($userId, $listStt, $orderBy, $limit, $frame);
+                $this->status(200);
+                return $this->response(['status' => true, 'data' => $data]);
+            } catch (Exception $e) {
+                $this->status(400);
+                return $this->response(['status' => false, 'message' => $e->getMessage()]);
+            }
+        } else if (in_array($role, ['Not Authenticated'])) {
+            $this->status(401);
+            return $this->response(['status' => false, 'message' => 'Not Authenticated']);
+        }
+    }
+
+    public function getOrders()
+    {
+        $authHeader = RestApi::headerData('Authorization');
+        $role = authHeader($authHeader);
+        if (in_array($role, ['admin'])) {
+            try {
+                $userId = RestApi::getParams('user_id');
+                $limit = RestApi::getParams('limit');
+                $frame = RestApi::getParams('frame');
+                $status = RestApi::getParams('status');
+                $orderBy = RestApi::getParams('order_by');
+                $statusArr = explode(",", $status);
+                $listStt = [];
+                if (is_array($statusArr) && count($statusArr) > 0) {
+                    foreach ($statusArr as $stt) {
+                        if ($stt == 'pending') {
+                            array_push($listStt, 'Pending');
+                        } else if ($stt == 'accepted') {
+                            array_push($listStt, 'Accepted');
+                        } else if ($stt == 'shipping') {
+                            array_push($listStt, 'Shipping');
+                        } else if ($stt == 'done') {
+                            array_push($listStt, 'Done');
+                        }
+                    }
+                }
+                $orderBy = $orderBy == 'asc' ? 'ASC' : 'DESC';
+                $limit = $limit ? ((int)$limit > 0 ? (int)$limit : 12) : 12;
+                $frame = $frame ? ((int)$frame > 0 ? (int)$frame : 1) : 1;
+                $data = $this->ordersModel->getOrders($userId, $listStt, $orderBy, $limit, $frame);
+                $this->status(200);
+                return $this->response(['status' => true, 'data' => $data]);
+            } catch (Exception $e) {
+                $this->status(400);
+                return $this->response(['status' => false, 'message' => $e->getMessage()]);
+            }
+        } else if (in_array($role, ['customer', 'self'])) {
+            $this->status(403);
+            return $this->response(['status' => false, 'message' => 'Not Authorized']);
+        } else if (in_array($role, ['Not Authenticated'])) {
+            $this->status(401);
+            return $this->response(['status' => false, 'message' => 'Not Authenticated']);
+        }
+    }
+
+    public function cancelAnOrder()
+    {
+        echo "Cancel Orders";
+    }
+
+    public function orderDetail()
+    {
+        echo "Orders Details";
     }
 
     private function validatePhone(&$phone)

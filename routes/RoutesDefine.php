@@ -38,4 +38,13 @@ $routes = [
     array('method' => 'POST', 'route' => 'api/order/create', 'regex' => '/^api\/order\/create\/?$/', 'controller' => 'OrdersController', 'action' => 'createAnOrder'),
     // Update status of order (admin)
     array('method' => 'PUT', 'route' => 'api/order/update-status', 'regex' => '/^api\/order\/update-status\/?$/', 'controller' => 'OrdersController', 'action' => 'updateStatusOrder'),
+    // My order (self)
+    array('method' => 'GET', 'route' => 'api/order/my-orders', 'regex' => '/^api\/order\/my-orders\/?$/', 'controller' => 'OrdersController', 'action' => 'myOrders'),
+    // Query orders (admin)
+    array('method' => 'GET', 'route' => 'api/order/orders', 'regex' => '/^api\/order\/orders\/?$/', 'controller' => 'OrdersController', 'action' => 'getOrders'),
+    // Cancel an order (self)
+    array('method' => 'PUT', 'route' => 'api/order/cancel/{orderId}', 'regex' => '/^api\/order\/cancel\/[0-9]+\/?$/', 'controller' => 'OrdersController', 'action' => 'cancelAnOrder'),
+    // Detail order (admin, self)
+    array('method' => 'GET', 'route' => 'api/order/{orderId}', 'regex' => '/^api\/order\/[0-9]+\/?$/', 'controller' => 'OrdersController', 'action' => 'orderDetail'),
+
 ];

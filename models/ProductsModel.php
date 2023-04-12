@@ -46,17 +46,13 @@ class ProductsModel extends Model
         } else if ($sortBy == 'price' && $orderBy == 'desc') {
             $sortBy = 'maxPrice';
         }
+        $catsString = "";
         if (is_array($categories) && count($categories) > 0) {
-            $catsString = "(" . implode(", ", $categories) . ")";
-        } else {
-            $catsString = "()";
+            foreach ($categories as $value) {
+                $catsString = $catsString . "AND ProductsInCategories.categoryId = '{$value}' ";
+            }
         }
         $offset = ($page - 1) * $limit;
-        if ($catsString == '()') {
-            $catsString = "";
-        } else {
-            $catsString = "AND ProductsInCategories.categoryId IN {$catsString}";
-        }
         if (in_array($sortBy, ['minPrice', 'maxPrice', 'createdAt'])) {
             $sql = "
                 SELECT 

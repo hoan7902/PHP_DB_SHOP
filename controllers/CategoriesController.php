@@ -37,12 +37,12 @@ class CategoriesController extends Controller
                 $this->status(500);
                 return $this->response(['status' => false, 'message' => 'Post failed: ' . $e->getMessage()]);
             }
-        } else if (in_array($role, ['Not Authentication', 'self', 'customer'])) {
+        } else if (in_array($role, ['self', 'customer'])) {
             $this->status(403);
-            return $this->response(['status' => false, 'message' => 'Not Authentication']);
+            return $this->response(['status' => false, 'message' => 'Not Authorized']);
         } else {
             $this->status(401);
-            return $this->response(['status' => false, 'message' => 'Not Authorization']);
+            return $this->response(['status' => false, 'message' => 'Not Authenticated']);
         }
     }
     public function getCategories()

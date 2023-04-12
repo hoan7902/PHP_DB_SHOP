@@ -282,10 +282,10 @@ class ProductsController extends Controller
         $minPrice = $minPrice ? ((int)$minPrice < 0 ? 0 : (int)$minPrice) : 0;
         $maxPrice = $maxPrice ? ((int)$maxPrice < 0 ? 3e38 : (int)$maxPrice) : 3e38;
         if ($categories) {
-            $categories = explode('%C2', $categories);
+            $categories = explode(',', $categories);
         }
         if ($collections) {
-            $collections = explode('%C2', $collections);
+            $collections = explode(',', $collections);
         }
         $data = $this->productsModel->getProducts($sortBy, $orderBy, $limit, $page, $minPrice, $maxPrice, $categories, $collections);
         if (count($data) > 0) {
@@ -299,7 +299,7 @@ class ProductsController extends Controller
             }
         }
         $this->status(200);
-        return $this->response($data);
+        return $this->response(['status' => true, 'data' => $data]);
     }
 
     private function addImages($productId, $imgs)
