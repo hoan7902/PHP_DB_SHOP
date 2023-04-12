@@ -2,3 +2,7 @@ RewriteEngine On
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteRule ^(.+)$ index.php?uri=$1 [L,QSA]
+
+Header set Access-Control-Allow-Origin "*"
+Header set Access-Control-Allow-Methods "POST, GET, OPTIONS, PUT, DELETE"
+Header set Access-Control-Allow-Headers "Authorization, Origin, X-Requested-With, Content-Type, Accept"
