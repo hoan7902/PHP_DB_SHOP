@@ -4,8 +4,10 @@ require_once("./utils/RestApi.php");
 require_once("./utils/JWTHelper.php");
 require_once("./utils/HandleUri.php");
 require_once("./models/SizesModel.php");
+require_once('./models/CartsModel.php');
 require_once("./models/UsersHaveOrdersModel.php");
 require_once("./models/ProductsInOrdersModel.php");
+require_once('./controllers/CartsController.php');
 
 class OrdersController extends Controller
 {
@@ -92,6 +94,11 @@ class OrdersController extends Controller
                 // Insert ProductsInOrders
                 $productsInOrdersModel = new ProductsInOrdersModel();
                 $productsInOrdersModel->insertProductsInOrder($orderId, $products);
+                $productIds = [];
+                foreach ($products as $product) {
+                    array_push($productIds, $product['productId']);
+                }
+                $this->checkAndRemoveProductsInCart($userId, $productIds);
                 $this->status(201);
                 return $this->response(['status' => true, 'message' => 'Order successfully']);
             } else {
@@ -270,5 +277,20 @@ class OrdersController extends Controller
         $phone = trim($phone);
         if (preg_match('/^\(?(\d{3})\)?[- ]?(\d{3})[- ]?(\d{4})$/', $phone)) return true;
         return false;
+    }
+    private function checkAndRemoveProductsInCart($userId, $productIds)
+    {
+        try {
+            $cartsContrller = new CartsController();
+            $cartsModel = new CartsModel();
+            foreach ($productIds as $productId) {
+                if ($cartsContrller->isValidInCart($userId, $productId)) {
+                    $cartsModel->removeOneFromCart($userId, $productId);
+                }
+            }
+            return true;
+        } catch (Exception $e) {
+            return false;
+        }
     }
 }

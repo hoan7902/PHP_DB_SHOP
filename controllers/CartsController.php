@@ -124,7 +124,7 @@ class CartsController extends Controller
             return $this->response(['status' => false, 'message' => 'Not Authorized']);
         }
     }
-    private function isValidProduct($productId)
+    public function isValidProduct($productId)
     {
         try {
             $productsModel = new ProductsModel();
@@ -137,10 +137,11 @@ class CartsController extends Controller
             return false;
         }
     }
-    private function isValidInCart($userId, $productId)
+    public function isValidInCart($userId, $productId)
     {
         try {
-            $cart = $this->cartsModel->getBy(['userId' => $userId, 'productId' => $productId]);
+            $cartsModel = new CartsModel();
+            $cart = $cartsModel->getBy(['userId' => $userId, 'productId' => $productId]);
             if (count($cart) > 0) {
                 return true;
             }
