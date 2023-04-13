@@ -15,7 +15,6 @@ class OrdersController extends Controller
     }
     public function createAnOrder()
     {
-        return $this->response(['status' => false, 'message' => 'test']);
         $authHeader = RestApi::headerData('Authorization');
         $role = authHeader($authHeader);
         if (in_array($role, ['admin', 'customer'])) {
@@ -86,7 +85,6 @@ class OrdersController extends Controller
                 // Insert Order
                 $this->ordersModel->insertOrder($phone, $cost, $note, $address);
                 $orderId = $this->ordersModel->getConn()->insert_id;
-                print_r($orderId);
                 // Insert UsersHaveOrders
                 $usersHaveOrdersModel = new UsersHaveOrdersModel();
                 $usersHaveOrdersModel->insertOrder($orderId, $userId);

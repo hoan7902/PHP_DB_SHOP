@@ -26,13 +26,13 @@ $routes = [
     array('method' => 'GET', 'route' => 'api/products/{frame}', 'regex' => '/^api\/products\/?$/', 'controller' => "ProductsController", 'action' => "getProducts"),
     // Update a product (admin)
     array('method' => 'POST', 'route' => 'api/product/update', 'regex' => '/^api\/product\/update\/?$/', 'controller' => 'ProductsController', 'action' => 'updateProduct'),
+    // Remove a product out of category
+    array('method' => 'DELETE', 'route' => 'api/product/removepoc', 'regex' => '/^api\/product\/removepoc\/?$/', 'controller' => "ProductsInCategoriesController", 'action' => "removeProductOutOfCat"),
 
     // Create a category (admin)
     array('method' => 'POST', 'route' => 'api/category', 'regex' => '/^api\/category\/?$/', 'controller' => "CategoriesController", 'action' => "addCategory"),
     // Get a list categories (user)
     array('method' => 'GET', 'route' => 'api/categories', 'regex' => '/^api\/categories\/?$/', 'controller' => "CategoriesController", 'action' => "getCategories"),
-    // Remove a product out of category
-    array('method' => 'PUT', 'route' => 'api/product/removepoc', 'regex' => '/^api\/product\/removepoc\/?$/', 'controller' => "ProductsInCategoriesController", 'action' => "removeProductOutOfCat"),
 
     // Create An Order (customer)
     array('method' => 'POST', 'route' => 'api/order/create', 'regex' => '/^api\/order\/create\/?$/', 'controller' => 'OrdersController', 'action' => 'createAnOrder'),
