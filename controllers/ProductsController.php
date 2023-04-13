@@ -226,9 +226,12 @@ class ProductsController extends Controller
                 $images = array_map(function ($image) {
                     return $image['imageLink'];
                 }, $images);
-                $data = [...$data[0], 'sizes' => $sizes, 'images' => $images, 'categories' => $categories];
+                // $data = [...$data[0], 'sizes' => $sizes, 'images' => $images, 'categories' => $categories];
+                // $this->status(200);
+                // return $this->response(['status' => true, ...$data]);
+                $data = array_merge($data[0], ['sizes' => $sizes, 'images' => $images, 'categories' => $categories]);
                 $this->status(200);
-                return $this->response(['status' => true, ...$data]);
+                return $this->response(array_merge(['status' => true], $data));
             } else {
                 $this->status(400);
                 return $this->response(['status' => false, 'message' => 'Product does not exist']);
