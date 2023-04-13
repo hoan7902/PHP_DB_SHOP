@@ -129,7 +129,7 @@ class OrdersController extends Controller
                 $this->status(400);
                 return $this->response(['status' => false, 'message' => 'Update failed']);
             }
-        } else if (in_array($role, ['customer'])) {
+        } else if (in_array($role, ['customer', 'self'])) {
             $this->status(403);
             return $this->response(['status' => false, 'message' => 'Not Authorized']);
         } else if (in_array($role, ['Not Authenticated'])) {

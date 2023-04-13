@@ -63,6 +63,36 @@ class CategoriesController extends Controller
     }
     public function deleteCategory()
     {
-        echo "Delete Category";
+        $authHeader = RestApi::headerData('Authorization');
+        $role = authHeader($authHeader);
+        if ($role == 'admin') {
+            try {
+                $params = HandleUri::sliceUri();
+                $categoryId = $params ? ($params[2] ? $params[2] : null) : null;
+                if ($categoryId) {
+                    $deleted = $this->categoryModel->delete(['categoryId' => $categoryId]);
+                    if ($deleted) {
+                        if (mysqli_affected_rows($this->categoryModel->getConn()) > 0) {
+                            $this->status(204);
+                        } else {
+                            throw new Exception('Nothing changes');
+                        }
+                    } else {
+                        throw new Exception('Delete Failed');
+                    }
+                } else {
+                    throw new Exception('Delete Failed');
+                }
+            } catch (Exception $e) {
+                $this->status(400);
+                return $this->response(['status' => false, 'message' => $e->getMessage()]);
+            }
+        } else if (in_array($role, ['customer'])) {
+            $this->status(403);
+            return $this->response(['status' => false, 'message' => 'Not Authorized']);
+        } else if (in_array($role, ['Not Authenticated'])) {
+            $this->status(401);
+            return $this->response(['status' => false, 'message' => 'Not Authenticated']);
+        }
     }
 }

@@ -236,15 +236,25 @@ class ProductsController extends Controller
 
     public function deleteOneProduct()
     {
-        $params = HandleUri::sliceUri();
-        $productId = $params ? ($params[2] ? $params[2] : null) : null;
-        try {
-            $this->productsModel->deleteByHideProduct($productId);
-            $this->status(204);
-            return;
-        } catch (Exception $e) {
-            $this->status(400);
-            return $this->response(['status' => false, 'message' => $e->getMessage()]);
+        $authHeader = RestApi::headerData('Authorization');
+        $role = authHeader($authHeader);
+        if ($role == 'admin') {
+            $params = HandleUri::sliceUri();
+            $productId = $params ? ($params[2] ? $params[2] : null) : null;
+            try {
+                $this->productsModel->deleteByHideProduct($productId);
+                $this->status(204);
+                return;
+            } catch (Exception $e) {
+                $this->status(400);
+                return $this->response(['status' => false, 'message' => $e->getMessage()]);
+            }
+        } else if (in_array($role, ['customer', 'self'])) {
+            $this->status(403);
+            return $this->response(['status' => false, 'message' => 'Not Authorized']);
+        } else if (in_array($role, ['Not Authenticated'])) {
+            $this->status(401);
+            return $this->response(['status' => false, 'message' => 'Not Authenticated']);
         }
     }
 
