@@ -44,9 +44,10 @@ CREATE TABLE `Categories` (
 
 CREATE TABLE `Carts` (
   `cartId` int(11) PRIMARY KEY AUTO_INCREMENT,
-  `userId` int(11),
-  `productId` int(11),
-  `time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+  `userId` int(11) NOT NULL,
+  `productId` int(11) NOT NULL,
+  `time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  UNIQUE (`userId`, `productId`)
 );
 
 CREATE TABLE `ProductsInOrders` (
