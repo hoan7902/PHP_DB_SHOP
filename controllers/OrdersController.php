@@ -240,8 +240,10 @@ class OrdersController extends Controller
                 $params = HandleUri::sliceUri();
                 $orderId = $params ? ($params[2] ? $params[2] : null) : null;
                 $userId = getUserId($authHeader);
-                if (count($this->ordersModel->validOrder($userId, $orderId)) != 1) {
-                    throw new Exception("You don't have permission to do this action");
+                if ($role != 'admin') {
+                    if (count($this->ordersModel->validOrder($userId, $orderId)) != 1) {
+                        throw new Exception("You don't have permission to do this action");
+                    }
                 }
                 $order = $this->ordersModel->getBy(['orderId' => $orderId]);
                 if (count($order) > 0) {
