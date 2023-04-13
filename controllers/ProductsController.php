@@ -5,6 +5,7 @@ require_once('./utils/RestApi.php');
 require_once('./utils/HandleUri.php');
 require_once('./models/ImagesModel.php');
 require_once('./models/SizesModel.php');
+require_once('./models/CategoriesModel.php');
 require_once('./controllers/ProductsInCategoriesController.php');
 require_once('./utils/FirebaseImageUploader.php');
 
@@ -153,6 +154,20 @@ class ProductsController extends Controller
                 }
             }
             try {
+                if ($updateCats && is_array($categories) && count($categories) > 0) {
+                    foreach ($categories as $categoryId) {
+                        if (!$this->isValidCategory($categoryId)) {
+                            return throw new Exception('Category does not exist');
+                        }
+                    }
+                    $productsInCategoriesModel = new ProductsInCategoriesModel();
+                    // Hold old categories
+                    $oldCategories = $productsInCategoriesModel->getCatsOfProduct($productId);
+                    // Delete old categories
+                    $productsInCategoriesModel->deleteAllCatsOfProduct($productId);
+                    // Update new categories
+                    $productsInCategoriesModel->insertProductsInCategory($productId, $categories);
+                }
                 if ($updateImages) {
                     $imagesModel = new ImagesModel();
                     // Hold old images
@@ -172,15 +187,6 @@ class ProductsController extends Controller
                         return $this->response(['status' => false, 'message' => 'Update failed']);
                     }
                 }
-                if ($updateCats && is_array($categories) && count($categories) > 0) {
-                    $productsInCategoriesModel = new ProductsInCategoriesModel();
-                    // Hold old categories
-                    $oldCategories = $productsInCategoriesModel->getCatsOfProduct($productId);
-                    // Delete old categories
-                    $productsInCategoriesModel->deleteAllCatsOfProduct($productId);
-                    // Update new categories
-                    $productsInCategoriesModel->insertProductsInCategory($productId, $categories);
-                }
                 if ($updateSizes) {
                     $sizesModel = new SizesModel();
                     // Delete old sizes
@@ -193,8 +199,7 @@ class ProductsController extends Controller
                 $this->status(200);
                 return $this->response(['status' => true, 'message' => 'Update successfully']);
             } catch (Exception $e) {
-                $this->productsModel->deleteProduct($productId);
-                $this->status(500);
+                $this->status(400);
                 return $this->response(['status' => false, 'message' => 'Post failed: ' . $e->getMessage()]);
             }
         } else if (in_array($role, ['self', 'customer'])) {
@@ -330,6 +335,15 @@ class ProductsController extends Controller
                 return true;
         } catch (Exception $e) {
             return false;
+        }
+        return false;
+    }
+    public function isValidCategory($categoryId)
+    {
+        $categoriesModel = new CategoriesModel();
+        $cat = $categoriesModel->getBy(['categoryId' => $categoryId]);
+        if (count($cat) > 0) {
+            return true;
         }
         return false;
     }
