@@ -2,6 +2,7 @@
 
 require_once("./utils/RestApi.php");
 require_once("./utils/JWTHelper.php");
+require_once("./utils/HandleUri.php");
 require_once("./models/SizesModel.php");
 require_once("./models/UsersHaveOrdersModel.php");
 require_once("./models/ProductsInOrdersModel.php");
@@ -48,9 +49,9 @@ class OrdersController extends Controller
                 if ($address == null) {
                     $this->status(400);
                     return $this->response(['status' => false, 'message' => 'Address is not null']);
-                } else if (!(strlen($address) > 6 && strlen($address) < 500)) {
+                } else if (!(strlen($address) > 0 && strlen($address) < 500)) {
                     $this->status(400);
-                    return $this->response(['status' => false, 'message' => 'Length of address must be in range [6, 500]']);
+                    return $this->response(['status' => false, 'message' => 'Length of address must be in range [1, 500]']);
                 }
                 // Validate note
                 if ($note == null) {
@@ -227,12 +228,39 @@ class OrdersController extends Controller
 
     public function cancelAnOrder()
     {
-        echo "Cancel Orders";
+        echo "Cancel An Order API: Updating....";
     }
 
     public function orderDetail()
     {
-        echo "Orders Details";
+        $authHeader = RestApi::headerData('Authorization');
+        $role = authHeader($authHeader);
+        if (in_array($role, ['admin', 'customer', 'self'])) {
+            try {
+                $params = HandleUri::sliceUri();
+                $orderId = $params ? ($params[2] ? $params[2] : null) : null;
+                $userId = getUserId($authHeader);
+                if (count($this->ordersModel->validOrder($userId, $orderId)) != 1) {
+                    throw new Exception("You don't have permission to do this action");
+                }
+                $order = $this->ordersModel->getBy(['orderId' => $orderId]);
+                if (count($order) > 0) {
+                    $data = $order[0];
+                    $detail = $this->ordersModel->getDetail($orderId);
+                    $data['products'] = $detail;
+                    $this->status(200);
+                    return $this->response(['status' => true, 'data' => $data]);
+                } else {
+                    $this->status(400);
+                    throw new Exception('This order does not exist');
+                }
+            } catch (Exception $e) {
+                return $this->response(['status' => false, 'message' => $e->getMessage()]);
+            }
+        } else if (in_array($role, ['Not Authenticated'])) {
+            $this->status(401);
+            return $this->response(['status' => false, 'message' => 'Not Authenticated']);
+        }
     }
 
     private function validatePhone(&$phone)

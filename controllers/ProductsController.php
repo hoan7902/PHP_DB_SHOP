@@ -48,9 +48,9 @@ class ProductsController extends Controller
             }
             $name = trim($name);
             $desc = trim($desc);
-            if (strlen($name) < 12 || strlen($name) > 500) {
+            if (strlen($name) < 1 || strlen($name) > 500) {
                 $this->status(400);
-                return $this->response(['status' => false, 'message' => 'Length of name must be in range [12, 500]']);
+                return $this->response(['status' => false, 'message' => 'Length of name must be in range [1, 500]']);
             }
             $productId = null;
             try {

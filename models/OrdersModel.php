@@ -64,4 +64,33 @@ class OrdersModel extends Model
             throw new Exception($e->getMessage());
         }
     }
+    public function getDetail($orderId)
+    {
+        $sql = "
+            SELECT po.productId, po.size, po.quantity, s.price FROM ProductsInOrders po
+                INNER JOIN Sizes s ON po.size = s.sizeName AND po.productId = s.productId
+                WHERE po.orderId = {$orderId};
+        ";
+        $query = $this->query($sql);
+        $data = [];
+        if ($query) {
+            while ($row = mysqli_fetch_assoc($query)) {
+                array_push($data, $row);
+            }
+        }
+        return $data;
+    }
+    public function validOrder($userId, $orderId)
+    {
+        $sql = "SELECT * FROM UsersHaveOrders WHERE userId = $userId AND orderId = $orderId";
+        $query = $this->query($sql);
+        $data = [];
+        if ($query) {
+            while ($row = mysqli_fetch_assoc($query)) {
+                array_push($data, $row);
+            }
+            return $data;
+        }
+        return $data;
+    }
 }

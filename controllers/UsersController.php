@@ -271,8 +271,8 @@ class UsersController extends Controller
     private function validateName(&$name)
     {
         $name = trim($name);
-        if (strlen($name) < 6 || strlen($name) > 100) {
-            throw new Exception("Length of name must be in range [6, 100]");
+        if (strlen($name) < 1 || strlen($name) > 100) {
+            throw new Exception("Length of name must be in range [1, 100]");
         }
         return $name;
     }
