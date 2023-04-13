@@ -12,4 +12,8 @@ class CategoriesModel extends Model
     {
         return $this->insert($data);
     }
+    public function updateCategory($categoryId, $data)
+    {
+        return $this->updateOne(['categoryId' => $categoryId], $data);
+    }
 }

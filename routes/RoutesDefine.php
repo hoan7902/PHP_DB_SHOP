@@ -33,7 +33,10 @@ $routes = [
     array('method' => 'POST', 'route' => 'api/category', 'regex' => '/^api\/category\/?$/', 'controller' => "CategoriesController", 'action' => "addCategory"),
     // Get a list categories (user)
     array('method' => 'GET', 'route' => 'api/categories', 'regex' => '/^api\/categories\/?$/', 'controller' => "CategoriesController", 'action' => "getCategories"),
+    // Delete a category (admin)
     array('method' => 'DELETE', 'route' => 'api/category/{categoryId}', 'regex' => '/^api\/category\/[0-9]+\/?$/', 'controller' => 'CategoriesController', 'action' => 'deleteCategory'),
+    // Modify a category (admin)
+    array('method' => 'PUT', 'route' => 'api/category/{categoryId}', 'regex' => '/^api\/category\/[0-9]+\/?$/', 'controller' => 'CategoriesController', 'action' => 'updateCategory'),
 
     // Create An Order (customer)
     array('method' => 'POST', 'route' => 'api/order/create', 'regex' => '/^api\/order\/create\/?$/', 'controller' => 'OrdersController', 'action' => 'createAnOrder'),

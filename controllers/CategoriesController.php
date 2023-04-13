@@ -95,4 +95,42 @@ class CategoriesController extends Controller
             return $this->response(['status' => false, 'message' => 'Not Authenticated']);
         }
     }
+    public function updateCategory()
+    {
+        $authHeader = RestApi::headerData('Authorization');
+        $role = authHeader($authHeader);
+        if ($role == 'admin') {
+            try {
+                $params = HandleUri::sliceUri();
+                $categoryId = $params ? ($params[2] ? $params[2] : null) : null;
+                $name = RestApi::bodyData('name');
+                $desc = RestApi::bodyData('description');
+                if ($categoryId) {
+                    $name = trim($name);
+                    $desc = trim($desc);
+                    if (strlen($name) < 1 || strlen($name) > 500) {
+                        throw new Exception('Length of name must be in range [1, 500]');
+                    }
+                    $updated = $this->categoryModel->updateCategory($categoryId, ['name' => $name, 'description' => $desc]);
+                    if ($updated > 0) {
+                        $this->status(200);
+                        return $this->response(['status' => true, 'message' => 'Update successfully']);
+                    } else {
+                        throw new Exception('Update failed: Nothing changes');
+                    }
+                } else {
+                    throw new Exception('Category does not exsit');
+                }
+            } catch (Exception $e) {
+                $this->status(400);
+                return $this->response(['status' => false, 'message' => $e->getMessage()]);
+            }
+        } else if (in_array($role, ['customer'])) {
+            $this->status(403);
+            return $this->response(['status' => false, 'message' => 'Not Authorized']);
+        } else if (in_array($role, ['Not Authenticated'])) {
+            $this->status(401);
+            return $this->response(['status' => false, 'message' => 'Not Authenticated']);
+        }
+    }
 }
