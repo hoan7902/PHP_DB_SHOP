@@ -61,4 +61,8 @@ class CategoriesController extends Controller
             $this->response(['status' => false, 'message' => 'Get category error: ' . $e->getMessage()]);
         }
     }
+    public function deleteCategory()
+    {
+        echo "Delete Category";
+    }
 }

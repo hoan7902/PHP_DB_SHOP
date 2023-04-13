@@ -23,7 +23,7 @@ $routes = [
     // Delete a product (admin)
     array('method' => 'DELETE', 'route' => 'api/product/{productId}', 'regex' => '/^api\/product\/[0-9]+\/?$/', 'controller' => 'ProductsController', 'action' => 'deleteOneProduct'),
     // Get a list product (user)
-    array('method' => 'GET', 'route' => 'api/products/{frame}', 'regex' => '/^api\/products\/?$/', 'controller' => "ProductsController", 'action' => "getProducts"),
+    array('method' => 'GET', 'route' => 'api/products', 'regex' => '/^api\/products\/?$/', 'controller' => "ProductsController", 'action' => "getProducts"),
     // Update a product (admin)
     array('method' => 'POST', 'route' => 'api/product/update', 'regex' => '/^api\/product\/update\/?$/', 'controller' => 'ProductsController', 'action' => 'updateProduct'),
     // Remove a product out of category
@@ -33,6 +33,7 @@ $routes = [
     array('method' => 'POST', 'route' => 'api/category', 'regex' => '/^api\/category\/?$/', 'controller' => "CategoriesController", 'action' => "addCategory"),
     // Get a list categories (user)
     array('method' => 'GET', 'route' => 'api/categories', 'regex' => '/^api\/categories\/?$/', 'controller' => "CategoriesController", 'action' => "getCategories"),
+    array('method' => 'DELETE', 'route' => 'api/category/{categoryId}', 'regex' => '/^api\/category\/[0-9]+\/?$/', 'controller' => 'CategoriesController', 'action' => 'deleteCategory'),
 
     // Create An Order (customer)
     array('method' => 'POST', 'route' => 'api/order/create', 'regex' => '/^api\/order\/create\/?$/', 'controller' => 'OrdersController', 'action' => 'createAnOrder'),
