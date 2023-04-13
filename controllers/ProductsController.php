@@ -265,56 +265,61 @@ class ProductsController extends Controller
 
     public function getProducts()
     {
-        $orderBy = RestApi::getParams('order_by');
-        $sortBy = RestApi::getParams('sort_by');
-        $categories = RestApi::getParams('categories');
-        $page = RestApi::getParams('page');
-        $maxPrice = RestApi::getParams('max_price');
-        $minPrice = RestApi::getParams('min_price');
-        $collections = RestApi::getParams('collections');
-        $limit = RestApi::getParams('limit');
-        if ($orderBy == 'asc') {
-            $orderBy = 'ASC';
-        } else {
-            $orderBy = 'DESC';
-        }
-        if ($sortBy == 'price') {
-        } else if ($sortBy == 'order_count') {
-            $sortBy = 'orderCount';
-        } else {
-            $sortBy = 'createdAt';
-        }
-        if ($page) {
-            $page = (int)$page < 1 ? 1 : (int)$page;
-        } else {
-            $page = 1;
-        }
-        if ($limit) {
-            $limit = (int)$limit < 0 ? 24 : (int)$limit;
-        } else {
-            $limit = 24;
-        }
-        $minPrice = $minPrice ? ((int)$minPrice < 0 ? 0 : (int)$minPrice) : 0;
-        $maxPrice = $maxPrice ? ((int)$maxPrice < 0 ? 3e38 : (int)$maxPrice) : 3e38;
-        if ($categories) {
-            $categories = explode(',', $categories);
-        }
-        if ($collections) {
-            $collections = explode(',', $collections);
-        }
-        $data = $this->productsModel->getProducts($sortBy, $orderBy, $limit, $page, $minPrice, $maxPrice, $categories, $collections);
-        if (count($data) > 0) {
-            $imagesModel = new ImagesModel();
-            for ($i = 0; $i < count($data); $i++) {
-                $images = $imagesModel->getImages($data[$i]['productId']);
-                $data[$i]['images'] = [];
-                foreach ($images as $key => $img) {
-                    array_push($data[$i]['images'], $img['imageLink']);
+        try {
+            $orderBy = RestApi::getParams('order_by');
+            $sortBy = RestApi::getParams('sort_by');
+            $categories = RestApi::getParams('categories');
+            $page = RestApi::getParams('page');
+            $maxPrice = RestApi::getParams('max_price');
+            $minPrice = RestApi::getParams('min_price');
+            $collections = RestApi::getParams('collections');
+            $limit = RestApi::getParams('limit');
+            if ($orderBy == 'asc') {
+                $orderBy = 'ASC';
+            } else {
+                $orderBy = 'DESC';
+            }
+            if ($sortBy == 'price') {
+            } else if ($sortBy == 'order_count') {
+                $sortBy = 'orderCount';
+            } else {
+                $sortBy = 'createdAt';
+            }
+            if ($page) {
+                $page = (int)$page < 1 ? 1 : (int)$page;
+            } else {
+                $page = 1;
+            }
+            if ($limit) {
+                $limit = (int)$limit < 0 ? 24 : (int)$limit;
+            } else {
+                $limit = 24;
+            }
+            $minPrice = $minPrice ? ((int)$minPrice < 0 ? 0 : (int)$minPrice) : 0;
+            $maxPrice = $maxPrice ? ((int)$maxPrice < 0 ? 3e38 : (int)$maxPrice) : 3e38;
+            if ($categories) {
+                $categories = explode(',', $categories);
+            }
+            if ($collections) {
+                $collections = explode(',', $collections);
+            }
+            $data = $this->productsModel->getProducts($sortBy, $orderBy, $limit, $page, $minPrice, $maxPrice, $categories, $collections);
+            if (count($data) > 0) {
+                $imagesModel = new ImagesModel();
+                for ($i = 0; $i < count($data); $i++) {
+                    $images = $imagesModel->getImages($data[$i]['productId']);
+                    $data[$i]['images'] = [];
+                    foreach ($images as $key => $img) {
+                        array_push($data[$i]['images'], $img['imageLink']);
+                    }
                 }
             }
+            $this->status(200);
+            return $this->response(['status' => true, 'data' => $data]);
+        } catch (Exception $e) {
+            $this->status(400);
+            return $this->response(['status' => false, 'message' => $e->getMessage()]);
         }
-        $this->status(200);
-        return $this->response(['status' => true, 'data' => $data]);
     }
 
     private function addImages($productId, $imgs)
