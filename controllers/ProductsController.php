@@ -234,7 +234,7 @@ class ProductsController extends Controller
                 return $this->response(['status' => false, 'message' => 'Product does not exist']);
             }
         } catch (Exception $e) {
-            $this->status(500);
+            $this->status(400);
             return $this->response(['status' => false, 'message' => "Get Product Failed: " . $e->getMessage()]);
         }
     }
