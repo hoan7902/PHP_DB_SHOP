@@ -21,7 +21,6 @@ class RatingsController extends Controller
                 $params = HandleUri::sliceUri();
                 $star = RestApi::bodyData('star');
                 $comment = RestApi::bodyData('comment');
-
                 $productId = $params ? ((int)$params[2] >= 0 ? (int)$params[2] : null) : null;
                 if ($this->ratingsModel->canRating($userId, $productId)) {
                     if (!$this->ratingsModel->alreadyRated($userId, $productId)) {
@@ -47,9 +46,6 @@ class RatingsController extends Controller
             } catch (Exception $e) {
                 return $this->response(['status' => false, 'message' => $e->getMessage()]);
             }
-            $userId = getUserId($authHeader);
-            $params = HandleUri::sliceUri();
-            $productId = $params ? ((int)$params[2] >= 0 ? (int)$params[2] : null) : null;
         } else if (in_array($role, ['Not Authenticated'])) {
             $this->status(401);
             return $this->response(['status' => false, 'message' => 'Not Authenticated']);
@@ -57,5 +53,57 @@ class RatingsController extends Controller
     }
     public function editRating()
     {
+        $authHeader = RestApi::headerData('Authorization');
+        $role = authHeader($authHeader);
+        if (in_array($role, ['customer', 'self', 'admin'])) {
+            try {
+                $userId = getUserId($authHeader);
+                $params = HandleUri::sliceUri();
+                $star = RestApi::bodyData('star');
+                $comment = RestApi::bodyData('comment');
+                $productId = $params ? ((int)$params[2] >= 0 ? (int)$params[2] : null) : null;
+                if ($this->ratingsModel->canRating($userId, $productId)) {
+                    if ($this->ratingsModel->alreadyRated($userId, $productId)) {
+                        $updateStar = false;
+                        $updateComment = false;
+                        if ($star !== null) {
+                            $updateStar = true;
+                            if ($star && (int)$star >= 1 && (int)$star <= 5) {
+                                $star = (int)$star;
+                            } else {
+                                throw new Exception('Star must be in range [1, 5]');
+                            }
+                        }
+                        if ($comment !== null) {
+                            $updateComment = true;
+                        }
+                        $data = [];
+                        if ($updateStar) {
+                            $data['star'] = $star;
+                        }
+                        if ($updateComment) {
+                            $data['comment'] = $comment;
+                        }
+                        $this->ratingsModel->updateARating(['userId' => $userId, 'productId' => $productId], $data);
+                        if (mysqli_affected_rows($this->ratingsModel->getConn()) > 0) {
+                            $this->status(200);
+                            return $this->response(['status' => true, 'message' => 'Update rating successfully']);
+                        } else {
+                            $this->status(400);
+                            throw new Exception('Rating failed');
+                        }
+                    } else {
+                        throw new Exception("You have not rated this product");
+                    }
+                } else {
+                    throw new Exception('You can not rate this product');
+                }
+            } catch (Exception $e) {
+                return $this->response(['status' => false, 'message' => $e->getMessage()]);
+            }
+        } else if (in_array($role, ['Not Authenticated'])) {
+            $this->status(401);
+            return $this->response(['status' => false, 'message' => 'Not Authenticated']);
+        }
     }
 }

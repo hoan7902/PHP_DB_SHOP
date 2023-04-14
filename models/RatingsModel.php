@@ -17,6 +17,10 @@ class RatingsModel extends Model
     {
         return $this->insert(['userId' => $userId, 'productId' => $productId, 'star' => $star, 'comment' => $comment]);
     }
+    public function updateARating($condition, $data)
+    {
+        return $this->updateOne($condition, $data);
+    }
     public function canRating($userId, $productId)
     {
         $sql = "
