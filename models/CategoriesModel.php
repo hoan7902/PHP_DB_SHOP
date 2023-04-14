@@ -16,4 +16,8 @@ class CategoriesModel extends Model
     {
         return $this->updateOne(['categoryId' => $categoryId], $data);
     }
+    public function getCategory($categoryId)
+    {
+        return $this->getBy(['categoryId' => $categoryId]);
+    }
 }

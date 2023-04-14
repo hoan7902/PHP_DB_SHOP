@@ -72,6 +72,27 @@ class CategoriesController extends Controller
             $this->response(['status' => false, 'message' => 'Get category error: ' . $e->getMessage()]);
         }
     }
+    public function getCategory()
+    {
+        try {
+            $params = HandleUri::sliceUri();
+            $categoryId = $params ? ((int)$params[2] >= 0 ? (int)$params[2] : null) : null;
+            if ($categoryId === null) {
+                $this->status(400);
+                throw new Exception('Category ID does not exist');
+            }
+            $cats = $this->categoryModel->getCategory($categoryId);
+            if (count($cats) == 1) {
+                $this->status(200);
+                return $this->response(['status' => true, 'data' => $cats[0]]);
+            } else {
+                $this->status(400);
+                throw new Exception('Category does not exist');
+            }
+        } catch (Exception $e) {
+            return $this->response(['status' => false, 'message' => $e->getMessage()]);
+        }
+    }
     public function deleteCategory()
     {
         $authHeader = RestApi::headerData('Authorization');

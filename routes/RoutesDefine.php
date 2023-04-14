@@ -37,6 +37,8 @@ $routes = [
     array('method' => 'DELETE', 'route' => 'api/category/{categoryId}', 'regex' => '/^api\/category\/[0-9]+\/?$/', 'controller' => 'CategoriesController', 'action' => 'deleteCategory'),
     // Modify a category (admin)
     array('method' => 'PUT', 'route' => 'api/category/{categoryId}', 'regex' => '/^api\/category\/[0-9]+\/?$/', 'controller' => 'CategoriesController', 'action' => 'updateCategory'),
+    // Get a category (user)
+    array('method' => 'GET', 'route' => 'api/category/{categoryId}', 'regex' => '/^api\/category\/[0-9]+\/?$/', 'controller' => 'CategoriesController', 'action' => 'getCategory'),
 
     // Create An Order (customer)
     array('method' => 'POST', 'route' => 'api/order/create', 'regex' => '/^api\/order\/create\/?$/', 'controller' => 'OrdersController', 'action' => 'createAnOrder'),
@@ -62,5 +64,7 @@ $routes = [
     array('method' => 'POST', 'route' => 'api/rating/{productId}', 'regex' => '/^api\/rating\/[0-9]+\/?$/', 'controller' => 'RatingsController', 'action' => 'createRating'),
     // Edit rating
     array('method' => 'PUT', 'route' => 'api/rating/{productId}', 'regex' => '/^api\/rating\/[0-9]+\/?$/', 'controller' => 'RatingsController', 'action' => 'editRating'),
+    // Get my ratings
+    array('method' => 'GET', 'route' => 'api/rating/my-rating', 'regex' => '/^api\/rating\/my-rating\/?$/', 'controller' => 'RatingsController', 'action' => 'myRating'),
 
 ];

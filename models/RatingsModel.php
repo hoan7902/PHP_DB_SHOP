@@ -32,10 +32,19 @@ class RatingsModel extends Model
         }
         return $data;
     }
+    public function myRating($userId, $orderBy, $limit = 12, $frame = 1)
+    {
+        $sql = "
+            SELECT ur.userId, ur.productId, ur.star, ur.comment, p.name, p.description, p.createdAt, p.quantity FROM UsersRatingProducts ur
+            INNER JOIN Products p ON p.productId = ur.productId
+            WHERE p.deleted = 0 AND ur.userId = {$userId}
+
+        ;";
+    }
     public function canRating($userId, $productId)
     {
         $sql = "
-            SELECT * FROM Users  u
+            SELECT * FROM Users u
             INNER JOIN UsersHaveOrders uo ON u.userId = uo.userId
             INNER JOIN ProductsInOrders po ON po.orderId = uo.orderId
             WHERE uo.userId = {$userId}  AND po.productId = {$productId};
