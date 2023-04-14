@@ -61,8 +61,9 @@ class CategoriesController extends Controller
             $frame = $frame ? ((int)$frame >= 0 ? (int)$frame : 1) : 1;
             $data = $this->categoryModel->getAll(['*'], [$sortBy], true, $limit, $frame, $orderBy);
             if (count($data) > 0) {
+                $count = $this->categoryModel->count();
                 $this->status(200);
-                return $this->response(['status' => true, 'categories' => $data]);
+                return $this->response(['status' => true, 'count' => $count, 'categories' => $data]);
             } else {
                 $this->status(400);
                 return $this->response(['status' => false, 'No categories']);
