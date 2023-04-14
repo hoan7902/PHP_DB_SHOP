@@ -34,12 +34,23 @@ class RatingsModel extends Model
     }
     public function myRating($userId, $orderBy, $limit = 12, $frame = 1)
     {
+        $offset = ($frame - 1) * $limit;
         $sql = "
-            SELECT ur.userId, ur.productId, ur.star, ur.comment, p.name, p.description, p.createdAt, p.quantity FROM UsersRatingProducts ur
+            SELECT ur.userId, ur.productId, ur.star, ur.comment, ur.time, p.name, p.description, p.createdAt, p.quantity FROM UsersRatingProducts ur
             INNER JOIN Products p ON p.productId = ur.productId
             WHERE p.deleted = 0 AND ur.userId = {$userId}
-
+            ORDER BY ur.time {$orderBy}
+            LIMIT {$limit}
+            OFFSET {$offset}
         ;";
+        $query = $this->query($sql);
+        $data = [];
+        if ($query) {
+            while ($row = mysqli_fetch_assoc($query)) {
+                array_push($data, $row);
+            }
+        }
+        return $data;
     }
     public function canRating($userId, $productId)
     {

@@ -106,4 +106,32 @@ class RatingsController extends Controller
             return $this->response(['status' => false, 'message' => 'Not Authenticated']);
         }
     }
+    public function myRating()
+    {
+        $authHeader = RestApi::headerData('Authorization');
+        $role = authHeader($authHeader);
+        if (in_array($role, ['customer', 'self', 'admin'])) {
+            try {
+                $userId = getUserId($authHeader);
+                $orderBy = RestApi::getParams('order_by');
+                if ($orderBy == 'asc') {
+                    $orderBy = 'ASC';
+                } else {
+                    $orderBy = 'DESC';
+                }
+                $limit = RestApi::getParams('limit');
+                $frame = RestApi::getParams('frame');
+                $limit = $limit ? ((int)$limit > 0 ? (int)$limit : 12) : 12;
+                $frame = $frame ? ((int)$frame > 0 ? (int)$frame : 1) : 1;
+                $data = $this->ratingsModel->myRating($userId, $orderBy, $limit, $frame);
+                $this->status(200);
+                return $this->response(['status' => true, 'data' => $data]);
+            } catch (Exception $e) {
+                return $this->response(['status' => false, 'message' => $e->getMessage()]);
+            }
+        } else if (in_array($role, ['Not Authenticated'])) {
+            $this->status(401);
+            return $this->response(['status' => false, 'message' => 'Not Authenticated']);
+        }
+    }
 }
