@@ -309,7 +309,7 @@ class ProductsController extends Controller
             $data = $this->productsModel->getProducts($sortBy, $orderBy, $limit, $page, $minPrice, $maxPrice, $categories, $collections);
             if (count($data['data']) > 0) {
                 $imagesModel = new ImagesModel();
-                for ($i = 0; $i < count($data); $i++) {
+                for ($i = 0; $i < count($data['data']); $i++) {
                     $images = $imagesModel->getImages($data['data'][$i]['productId']);
                     $data['data'][$i]['images'] = [];
                     foreach ($images as $key => $img) {
