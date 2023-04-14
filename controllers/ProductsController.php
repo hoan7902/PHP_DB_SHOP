@@ -6,6 +6,7 @@ require_once('./utils/HandleUri.php');
 require_once('./models/ImagesModel.php');
 require_once('./models/SizesModel.php');
 require_once('./models/CategoriesModel.php');
+require_once('./models/RatingsModel.php');
 require_once('./controllers/ProductsInCategoriesController.php');
 require_once('./utils/FirebaseImageUploader.php');
 
@@ -61,12 +62,12 @@ class ProductsController extends Controller
                     $productId = $this->productsModel->getConn()->insert_id;
                     if (!$this->addImages((int)$productId, $imgUrls)) {
                         $this->productsModel->deleteProduct($productId);
-                        $this->status(500);
+                        $this->status(400);
                         return $this->response(['status' => false, 'message' => 'Post failed with images']);
                     }
                     if (!$this->addSizes((int)$productId, $sizes)) {
                         $this->productsModel->deleteProduct($productId);
-                        $this->status(500);
+                        $this->status(400);
                         return $this->response(['status' => false, 'message' => 'Post failed with sizes']);
                     }
                     if (is_array($categories) && count($categories) > 0) {
@@ -78,7 +79,7 @@ class ProductsController extends Controller
                 }
             } catch (Exception $e) {
                 $this->productsModel->deleteProduct($productId);
-                $this->status(500);
+                $this->status(400);
                 return $this->response(['status' => false, 'message' => 'Post failed: ' . $e->getMessage()]);
             }
         } else if (in_array($role, ['self', 'customer'])) {
@@ -229,9 +230,12 @@ class ProductsController extends Controller
                 // $data = [...$data[0], 'sizes' => $sizes, 'images' => $images, 'categories' => $categories];
                 // $this->status(200);
                 // return $this->response(['status' => true, ...$data]);
+
+                $ratingsModel = new RatingsModel();
+                $ratingPoint = $ratingsModel->getRatingPointAProduct($productId);
                 $data = array_merge($data[0], ['sizes' => $sizes, 'images' => $images, 'categories' => $categories]);
                 $this->status(200);
-                return $this->response(array_merge(['status' => true], $data));
+                return $this->response(array_merge(['status' => true], $ratingPoint, $data));
             } else {
                 $this->status(400);
                 return $this->response(['status' => false, 'message' => 'Product does not exist']);

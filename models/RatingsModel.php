@@ -21,6 +21,17 @@ class RatingsModel extends Model
     {
         return $this->updateOne($condition, $data);
     }
+    public function getRatingPointAProduct($productId)
+    {
+        $sql = "SELECT AVG(star) as ratingPoint, COALESCE(COUNT(*), 0) as numberRating FROM UsersRatingProducts 
+        WHERE productId = {$productId};";
+        $query = $this->query($sql);
+        $data = ['ratingPoint' => 0, 'numberRating' => 0];
+        if ($query) {
+            $data = mysqli_fetch_assoc($query);
+        }
+        return $data;
+    }
     public function canRating($userId, $productId)
     {
         $sql = "
