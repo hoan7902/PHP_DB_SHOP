@@ -157,7 +157,7 @@ class ProductsController extends Controller
                 if ($updateCats && is_array($categories) && count($categories) > 0) {
                     foreach ($categories as $categoryId) {
                         if (!$this->isValidCategory($categoryId)) {
-                            return throw new Exception('Category does not exist');
+                            throw new Exception('Category does not exist');
                         }
                     }
                     $productsInCategoriesModel = new ProductsInCategoriesModel();

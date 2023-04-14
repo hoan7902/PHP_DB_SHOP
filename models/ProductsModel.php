@@ -41,9 +41,9 @@ class ProductsModel extends Model
     }
     public function getProducts($sortBy, $orderBy, $limit, $page, $minPrice, $maxPrice, $categories, $collections)
     {
-        if ($sortBy == 'price' && $orderBy == 'asc') {
+        if ($sortBy == 'price' && $orderBy == 'ASC') {
             $sortBy = 'minPrice';
-        } else if ($sortBy == 'price' && $orderBy == 'desc') {
+        } else if ($sortBy == 'price' && $orderBy == 'DESC') {
             $sortBy = 'maxPrice';
         }
         $catsString = "";
