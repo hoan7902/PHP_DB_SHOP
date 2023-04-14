@@ -124,8 +124,9 @@ class RatingsController extends Controller
                 $limit = $limit ? ((int)$limit > 0 ? (int)$limit : 12) : 12;
                 $frame = $frame ? ((int)$frame > 0 ? (int)$frame : 1) : 1;
                 $data = $this->ratingsModel->myRating($userId, $orderBy, $limit, $frame);
+                $count = $this->ratingsModel->myRatingCount($userId);
                 $this->status(200);
-                return $this->response(['status' => true, 'data' => $data]);
+                return $this->response(['status' => true, 'count' => $count, 'data' => $data]);
             } catch (Exception $e) {
                 return $this->response(['status' => false, 'message' => $e->getMessage()]);
             }

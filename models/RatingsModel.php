@@ -52,6 +52,19 @@ class RatingsModel extends Model
         }
         return $data;
     }
+    public function myRatingCount($userId)
+    {
+        $sql = "
+            SELECT ur.userId, ur.productId, ur.star, ur.comment, ur.time, p.name, p.description, p.createdAt, p.quantity FROM UsersRatingProducts ur
+            INNER JOIN Products p ON p.productId = ur.productId
+            WHERE p.deleted = 0 AND ur.userId = {$userId}
+        ";
+        $query = $this->query($sql);
+        if ($query) {
+            return $query->num_rows;
+        }
+        return 0;
+    }
     public function canRating($userId, $productId)
     {
         $sql = "
