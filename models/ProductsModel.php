@@ -27,11 +27,11 @@ class ProductsModel extends Model
         }
         return $this->getBy(['productId' => $productId, 'deleted' => 0], $selects);
     }
-    public function getCategoriesOfProduct($prodcutId)
+    public function getCategoriesOfProduct($productId)
     {
         $sql = "SELECT `Categories`.`categoryId`, `Categories`.`name`, `Categories`.`description` FROM `Categories`
         INNER JOIN `ProductsInCategories` ON `Categories`.`categoryId` = `ProductsInCategories`.`categoryId`
-        INNER JOIN `Products` ON `ProductsInCategories`.`productId` = `Products`.`productId` WHERE `ProductsInCategories`.`productId` = $prodcutId;";
+        INNER JOIN `Products` ON `ProductsInCategories`.`productId` = `Products`.`productId` WHERE `ProductsInCategories`.`productId` = $productId;";
         $query = $this->query($sql);
         $data = [];
         while ($row = mysqli_fetch_assoc($query)) {
@@ -80,6 +80,30 @@ class ProductsModel extends Model
                 LIMIT {$limit}
                 OFFSET {$offset};
                 ";
+            $countSql = "
+                SELECT 
+                    Products.productId, 
+                    Products.createdAt, 
+                    Products.name,
+                    Products.description, 
+                    MIN(Sizes.price) as minPrice, 
+                    MAX(Sizes.price) as maxPrice,
+                    COALESCE(SUM(DISTINCT po.quantity), 0) AS soldQuantity
+                FROM 
+                    Sizes 
+                    INNER JOIN Products ON Sizes.productId = Products.productId 
+                    INNER JOIN ProductsInCategories ON ProductsInCategories.productId = Products.productId
+                    LEFT JOIN (SELECT productId, SUM(quantity) AS quantity FROM ProductsInOrders GROUP BY productId) po ON Products.productId = po.productId
+                WHERE 
+                    Products.deleted = 0
+                    {$catsString}
+                GROUP BY 
+                    products.productId
+                HAVING 
+                    minPrice >= {$minPrice} AND maxPrice <= {$maxPrice}
+                ORDER BY 
+                    {$sortBy} {$orderBy};
+            ";
         } else if (in_array($sortBy, ['orderCount'])) {
             $sql = "
                 SELECT 
@@ -103,12 +127,35 @@ class ProductsModel extends Model
                 LIMIT {$limit}
                 OFFSET {$offset};
             ";
+            $countSql = "
+                SELECT 
+                    p.productId, 
+                    p.createdAt, 
+                    p.name,
+                    p.description, 
+                    MIN(s.price) as minPrice, 
+                    MAX(s.price) as maxPrice,
+                    COALESCE(SUM(DISTINCT po.quantity), 0) AS soldQuantity
+                FROM products p
+                    LEFT JOIN (SELECT productId, SUM(quantity) AS quantity FROM ProductsInOrders GROUP BY productId) po ON p.productId = po.productId
+                    INNER JOIN sizes s ON s.productId = p.productId
+                    INNER JOIN ProductsInCategories pc ON pc.productId = p.productId
+                WHERE 
+                    p.deleted = 0 
+                    {$catsString}
+                GROUP BY p.productId
+                HAVING minPrice >= {$minPrice} AND maxPrice <= {$maxPrice}
+                ORDER BY `soldQuantity` {$orderBy};
+            ";
         }
         $query = $this->query($sql);
+        $countQuery = $this->query($countSql);
+        $count = $countQuery->num_rows;
         $data = [];
         while ($row = mysqli_fetch_assoc($query)) {
             array_push($data, $row);
         }
-        return $data;
+        $mergeData = ['count' => $count, 'data' => $data];
+        return $mergeData;
     }
 }

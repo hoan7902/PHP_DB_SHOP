@@ -307,19 +307,18 @@ class ProductsController extends Controller
                 $collections = explode(',', $collections);
             }
             $data = $this->productsModel->getProducts($sortBy, $orderBy, $limit, $page, $minPrice, $maxPrice, $categories, $collections);
-            if (count($data) > 0) {
+            if (count($data['data']) > 0) {
                 $imagesModel = new ImagesModel();
                 for ($i = 0; $i < count($data); $i++) {
-                    $images = $imagesModel->getImages($data[$i]['productId']);
-                    $data[$i]['images'] = [];
+                    $images = $imagesModel->getImages($data['data'][$i]['productId']);
+                    $data['data'][$i]['images'] = [];
                     foreach ($images as $key => $img) {
-                        array_push($data[$i]['images'], $img['imageLink']);
+                        array_push($data['data'][$i]['images'], $img['imageLink']);
                     }
                 }
-                $count = $this->productsModel->count();
             }
             $this->status(200);
-            return $this->response(['status' => true, 'count' => $count, 'data' => $data]);
+            return $this->response(['status' => true, 'count' => $data['count'], 'data' => $data['data']]);
         } catch (Exception $e) {
             $this->status(400);
             return $this->response(['status' => false, 'message' => $e->getMessage()]);
