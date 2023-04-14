@@ -316,9 +316,10 @@ class ProductsController extends Controller
                         array_push($data[$i]['images'], $img['imageLink']);
                     }
                 }
+                $count = $this->productsModel->count();
             }
             $this->status(200);
-            return $this->response(['status' => true, 'data' => $data]);
+            return $this->response(['status' => true, 'count' => $count, 'data' => $data]);
         } catch (Exception $e) {
             $this->status(400);
             return $this->response(['status' => false, 'message' => $e->getMessage()]);

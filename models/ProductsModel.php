@@ -44,7 +44,7 @@ class ProductsModel extends Model
         if ($sortBy == 'price' && $orderBy == 'ASC') {
             $sortBy = 'minPrice';
         } else if ($sortBy == 'price' && $orderBy == 'DESC') {
-            $sortBy = 'maxPrice';
+            $sortBy = 'minPrice';
         }
         $catsString = "";
         if (is_array($categories) && count($categories) > 0) {

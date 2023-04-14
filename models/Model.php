@@ -141,6 +141,17 @@ class Model extends Database
         $query = $this->query($sql);
         return $query;
     }
+    public function count()
+    {
+        $sql = "SELECT COUNT(*) AS count FROM $this->table";
+        $query = $this->query($sql);
+        if ($query && $query->num_rows > 0) {
+            $row = $query->fetch_assoc();
+            $count = $row["count"];
+            return $count;
+        }
+        return 0;
+    }
     public function getConn()
     {
         return $this->conn;
