@@ -177,7 +177,7 @@ class OrdersController extends Controller
                 $frame = $frame ? ((int)$frame > 0 ? (int)$frame : 1) : 1;
                 $data = $this->ordersModel->getOrders($userId, $listStt, $orderBy, $limit, $frame);
                 $this->status(200);
-                return $this->response(['status' => true, 'data' => $data]);
+                return $this->response(['status' => true, 'count' => $data['count'], 'data' => $data['data']]);
             } catch (Exception $e) {
                 $this->status(400);
                 return $this->response(['status' => false, 'message' => $e->getMessage()]);
@@ -219,7 +219,7 @@ class OrdersController extends Controller
                 $frame = $frame ? ((int)$frame > 0 ? (int)$frame : 1) : 1;
                 $data = $this->ordersModel->getOrders($userId, $listStt, $orderBy, $limit, $frame);
                 $this->status(200);
-                return $this->response(['status' => true, 'data' => $data]);
+                return $this->response(['status' => true, 'count' => $data['count'], 'data' => $data['data']]);
             } catch (Exception $e) {
                 $this->status(400);
                 return $this->response(['status' => false, 'message' => $e->getMessage()]);

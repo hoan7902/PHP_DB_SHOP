@@ -53,13 +53,25 @@ class OrdersModel extends Model
             LIMIT {$limit}
             OFFSET {$offset};
         ";
+        $sqlCount = "
+            SELECT * FROM Orders
+            INNER JOIN UsersHaveOrders ON UsersHaveOrders.orderId = Orders.orderId
+            {$whereExpr}
+            GROUP BY Orders.orderId
+            ORDER BY Orders.orderTime {$orderBy};";
         try {
             $query = $this->query($sql);
+            $queryCount = $this->query($sqlCount);
+            if ($queryCount) {
+                $count = $queryCount->num_rows;
+            } else {
+                $count = 0;
+            }
             $data = [];
             while ($row = mysqli_fetch_assoc($query)) {
                 array_push($data, $row);
             }
-            return $data;
+            return ['count' => $count, 'data' => $data];
         } catch (Exception $e) {
             throw new Exception($e->getMessage());
         }
