@@ -57,4 +57,10 @@ $routes = [
     array('method' => 'DELETE', 'route' => 'api/cart/{productId}', 'regex' => '/^api\/cart\/[0-9]+\/?$/', 'controller' => 'CartsController', 'action' => 'removeFromCart'),
     // Query products in my cart (self)
     array('method' => 'GET', 'route' => 'api/cart/my-cart', 'regex' => '/^api\/cart\/my-cart\/?$/', 'controller' => 'CartsController', 'action' => 'queryMyCart'),
+
+    // Rating a product
+    array('method' => 'POST', 'route' => 'api/rating/{productId}', 'regex' => '/^api\/rating\/[0-9]+\/?$/', 'controller' => 'RatingsController', 'action' => 'createRating'),
+    // Edit rating
+    array('method' => 'PUT', 'route' => 'api/rating/{productId}', 'regex' => '/^api\/rating\/[0-9]+\/?$/', 'controller' => 'RatingsController', 'action' => 'editRating'),
+
 ];

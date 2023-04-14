@@ -48,7 +48,18 @@ class CategoriesController extends Controller
     public function getCategories()
     {
         try {
-            $data = $this->categoryModel->getAll();
+            $limit = RestApi::getParams('limit');
+            $frame = RestApi::getParams('frame');
+            $orderBy = RestApi::getParams('order_by');
+            $sortBy = 'categoryId';
+            if ($orderBy == 'asc') {
+                $orderBy = 'ASC';
+            } else {
+                $orderBy = 'DESC';
+            }
+            $limit = $limit ? ((int)$limit >= 0 ? (int)$limit : 12) : 12;
+            $frame = $frame ? ((int)$frame >= 0 ? (int)$frame : 1) : 1;
+            $data = $this->categoryModel->getAll(['*'], [$sortBy], true, $limit, $frame, $orderBy);
             if (count($data) > 0) {
                 $this->status(200);
                 return $this->response(['status' => true, 'categories' => $data]);

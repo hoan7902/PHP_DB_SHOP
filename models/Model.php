@@ -8,17 +8,18 @@ class Model extends Database
         $this->connect();
         return $this->conn->query($sql);
     }
-    public function getAll($selects = ['*'], $orderBys = [], $isLimited = false, $limit = 24)
+    public function getAll($selects = ['*'], $orderBys = [], $isLimited = false, $limit = 24, $frame = 1, $order = 'DESC')
     {
         $columns = implode(', ', $selects);
-        $orderByString = implode(' ', $orderBys);
-        if ($orderByString) {
+        $orderByString = implode(' ', $orderBys) . " " . $order;
+        $offset = ($frame - 1) * $limit;
+        if (count($orderBys) > 0) {
             $sql = "SELECT $columns FROM $this->table ORDER BY $orderByString";
         } else {
-            $sql = "SELECT $columns FROM $this->table LIMIT $limit ";
+            $sql = "SELECT $columns FROM $this->table";
         }
         if ($isLimited) {
-            $sql .= " LIMIT $limit";
+            $sql .= " LIMIT $limit OFFSET $offset";
         }
         $query = $this->query($sql);
         $data = [];

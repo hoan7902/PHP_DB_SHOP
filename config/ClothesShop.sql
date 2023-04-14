@@ -78,7 +78,7 @@ CREATE TABLE `ProductsInCategories` (
 CREATE TABLE `UsersRatingProducts` (
   `userId` int(11),
   `productId` int(11),
-  `time` datetime,
+  `time` datetime DEFAULT CURRENT_TIMESTAMP,
   `comment` text,
   `star` int,
   PRIMARY KEY (`userId`, `productId`)
