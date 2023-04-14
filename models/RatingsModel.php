@@ -13,4 +13,33 @@ class RatingsModel extends Model
     {
         return $this->getBy(['userId' => $userId, 'productId' => $productId]);
     }
+    public function createARating($userId, $productId, $star, $comment)
+    {
+        return $this->insert(['userId' => $userId, 'productId' => $productId, 'star' => $star, 'comment' => $comment]);
+    }
+    public function canRating($userId, $productId)
+    {
+        $sql = "
+            SELECT * FROM Users  u
+            INNER JOIN UsersHaveOrders uo ON u.userId = uo.userId
+            INNER JOIN ProductsInOrders po ON po.orderId = uo.orderId
+            WHERE uo.userId = {$userId}  AND po.productId = {$productId};
+        ";
+        $query = $this->query($sql);
+        if ($query && $query->num_rows > 0) {
+            return true;
+        }
+        return false;
+    }
+    public function alreadyRated($userId, $productId)
+    {
+        $sql = "
+            SELECT * FROM UsersRatingProducts WHERE userId = {$userId} AND productId = {$productId};
+        ";
+        $query = $this->query($sql);
+        if ($query && $query->num_rows > 0) {
+            return true;
+        }
+        return false;
+    }
 }
