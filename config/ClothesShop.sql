@@ -18,6 +18,9 @@ CREATE TABLE `Orders` (
   `cost` float,
   `note` varchar(255),
   `address` text(500),
+  `paid` boolean DEFAULT FALSE NOT NULL,
+  `paymentMethod` varchar(50) DEFAULT 'Cash',
+  `paymentDate` datetime DEFAULT NULL,
   `orderTime` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `deliveryTime` datetime
 );

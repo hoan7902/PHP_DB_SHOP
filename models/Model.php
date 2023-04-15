@@ -1,8 +1,13 @@
 <?php
-require_once('./config/Database.php');
+if (file_exists('./config/Database.php')) require_once('./config/Database.php');
+if (file_exists('../../config/Database.php')) require_once('../../config/Database.php');
 class Model extends Database
 {
     protected $table;
+    public function setTable($table)
+    {
+        $this->table = $table;
+    }
     public function query($sql)
     {
         $this->connect();

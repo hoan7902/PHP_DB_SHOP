@@ -21,7 +21,7 @@ class OrdersModel extends Model
     {
         if ($deliveryTime) {
             $currentTime = date('Y-m-d H:i:s');
-            return $this->updateOne(['orderId' => $orderId], ['status' => $status, 'deliveryTime' => $currentTime]);
+            return $this->updateOne(['orderId' => $orderId], ['status' => $status, 'deliveryTime' => $currentTime, 'paid' => 1, 'paymentDate' => $currentTime]);
         }
         return $this->updateOne(['orderId' => $orderId], ['status' => $status]);
     }

@@ -1,6 +1,7 @@
 <?php
 
-require_once('./config/configDB.php');
+if (file_exists('./config/configDB.php')) require_once('./config/configDB.php');
+if (file_exists('../../config/configDB.php')) require_once('../../config/configDB.php');
 
 class Database
 {
