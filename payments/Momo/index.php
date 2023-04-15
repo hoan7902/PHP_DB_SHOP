@@ -27,7 +27,7 @@ if ($orderId === null || (int)$orderId < 0) {
             echo json_encode(['message' => 'Đơn hàng đã được thanh toán']);
         } else {
             $payment = new MomoPayment();
-            $payment->initPayment($orderId, /* $order['cost'] */ "1000", "Thanh toán bằng Momo");
+            $payment->initPayment($orderId, $order['cost'], "Thanh toán bằng Momo");
         }
     } else {
         echo json_encode(['message' => 'Đơn hàng không tồn tại']);
