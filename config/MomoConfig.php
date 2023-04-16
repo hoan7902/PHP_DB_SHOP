@@ -10,3 +10,4 @@ define('MOMOCONFIG', array(
 ));
 
 define('CLIENTRETURNURL', 'http://localhost:3000');
+define('SERVERURL', 'http://localhost/LTW/BTL/Shop');
