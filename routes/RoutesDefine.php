@@ -66,5 +66,7 @@ $routes = [
     array('method' => 'PUT', 'route' => 'api/rating/{productId}', 'regex' => '/^api\/rating\/[0-9]+\/?$/', 'controller' => 'RatingsController', 'action' => 'editRating'),
     // Get my ratings
     array('method' => 'GET', 'route' => 'api/rating/my-rating', 'regex' => '/^api\/rating\/my-rating\/?$/', 'controller' => 'RatingsController', 'action' => 'myRating'),
+    // Get ratings of a product
+    array('method' => 'GET', 'route' => 'api/rating/{productId}', 'regex' => '/^api\/rating\/[0-9]+\/?$/', 'controller' => 'RatingsController', 'action' => 'ratingsOfProduct'),
 
 ];

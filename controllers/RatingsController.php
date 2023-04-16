@@ -135,4 +135,21 @@ class RatingsController extends Controller
             return $this->response(['status' => false, 'message' => 'Not Authenticated']);
         }
     }
+    public function ratingsOfProduct()
+    {
+        try {
+            $params = HandleUri::sliceUri();
+            $productId = $params ? ((int)$params[2] >= 0 ? (int)$params[2] : null) : null;
+            $limit = RestApi::getParams('limit');
+            $frame = RestApi::getParams('frame');
+            $limit = $limit ? ((int)$limit >= 0 ? (int)$limit : 24) : 24;
+            $frame = $frame ? ((int)$frame >= 1 ? (int)$frame : 1) : 1;
+            $data = $this->ratingsModel->getRatingsOfProduct($productId, $limit, $frame);
+            $this->status(200);
+            return $this->response(['status' => true, 'data' => $data]);
+        } catch (Exception $e) {
+            $this->status(400);
+            return $this->response(['status' => false, 'message' => $e->getMessage()]);
+        }
+    }
 }

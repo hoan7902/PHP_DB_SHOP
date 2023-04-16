@@ -90,4 +90,26 @@ class RatingsModel extends Model
         }
         return false;
     }
+    public function getRatingsOfProduct($productId, $limit, $frame)
+    {
+        $offset = ($frame - 1) * $limit;
+        $sql = "
+            SELECT urp.userId, u.name, urp.star, urp.comment, urp.time, u.avatar FROM UsersRatingProducts urp
+            INNER JOIN Users u ON u.userId = urp.userId
+            WHERE urp.productId = {$productId}
+            ORDER BY urp.time DESC
+            LIMIT {$limit}
+            OFFSET {$offset};
+        ";
+        $query = $this->query($sql);
+        $data = [];
+        if ($query) {
+            while ($row = mysqli_fetch_assoc($query)) {
+                $row['star'] = (int)$row['star'];
+                $row['userId'] = (int)$row['userId'];
+                array_push($data, $row);
+            }
+        }
+        return $data;
+    }
 }
