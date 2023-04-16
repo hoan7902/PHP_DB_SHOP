@@ -51,7 +51,7 @@ CREATE TABLE `Carts` (
   `userId` int(11) NOT NULL,
   `size` varchar(10),
   `quantity` int(11) DEFAULT 1,
-  `time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+  `time` datetime DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 CREATE TABLE `ProductsInOrders` (
