@@ -56,7 +56,7 @@ $routes = [
     // Add product to cart
     array('method' => 'POST', 'route' => 'api/cart/{productId}', 'regex' => '/^api\/cart\/[0-9]+\/?$/', 'controller' => 'CartsController', 'action' => 'addToCart'),
     // Remove product from cart
-    array('method' => 'DELETE', 'route' => 'api/cart/{productId}', 'regex' => '/^api\/cart\/[0-9]+\/?$/', 'controller' => 'CartsController', 'action' => 'removeFromCart'),
+    array('method' => 'DELETE', 'route' => 'api/cart/{productId}/{productSize}', 'regex' => '/^api\/cart\/[0-9]+\/\w{1,10}\/?$/', 'controller' => 'CartsController', 'action' => 'removeFromCart'),
     // Query products in my cart (self)
     array('method' => 'GET', 'route' => 'api/cart/my-cart', 'regex' => '/^api\/cart\/my-cart\/?$/', 'controller' => 'CartsController', 'action' => 'queryMyCart'),
 

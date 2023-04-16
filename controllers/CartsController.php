@@ -79,7 +79,8 @@ class CartsController extends Controller
                 $userId = getUserId($authHeader);
                 $params = HandleUri::sliceUri();
                 $productId = $params ? ($params[2] ? $params[2] : null) : null;
-                $size = RestApi::bodyData('size');
+                $size = $params ? ($params[3] ? $params[3] : null) : null;
+                // $size = RestApi::bodyData('size');
                 if ($productId === null) {
                     $this->status(400);
                     throw new Exception('Product ID does not exist');
