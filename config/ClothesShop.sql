@@ -9,7 +9,7 @@ CREATE TABLE `Users` (
   `address` text(500),
   `role` varchar(10) DEFAULT "customer",
   `createdAt` timestamp DEFAULT CURRENT_TIMESTAMP
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 CREATE TABLE `Orders` (
   `orderId` int(11) PRIMARY KEY AUTO_INCREMENT,
@@ -23,7 +23,7 @@ CREATE TABLE `Orders` (
   `paymentDate` datetime DEFAULT NULL,
   `orderTime` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `deliveryTime` datetime
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 CREATE TABLE `Products` (
   `productId` int(11) PRIMARY KEY AUTO_INCREMENT,
@@ -31,19 +31,19 @@ CREATE TABLE `Products` (
   `description` text,
   `createdAt` timestamp DEFAULT CURRENT_TIMESTAMP,
   `deleted` boolean DEFAULT 0
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 CREATE TABLE `Collections` (
   `collectionId` int(11) PRIMARY KEY AUTO_INCREMENT,
   `name` varchar(500),
   `description` text
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 CREATE TABLE `Categories` (
   `categoryId` int(11) PRIMARY KEY AUTO_INCREMENT,
   `name` varchar(500) UNIQUE,
   `description` text
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 CREATE TABLE `Carts` (
   `cartId` int(11) PRIMARY KEY AUTO_INCREMENT,
@@ -52,7 +52,7 @@ CREATE TABLE `Carts` (
   `size` varchar(10),
   `quantity` int(11) DEFAULT 1,
   `time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 CREATE TABLE `ProductsInOrders` (
   `productId` int(11),
@@ -60,24 +60,24 @@ CREATE TABLE `ProductsInOrders` (
   `size` varchar(10),
   `quantity` int(11),
   PRIMARY KEY(`productId`, `orderId`, `size`)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 CREATE TABLE `UsersHaveOrders` (
   `orderId` int(11) PRIMARY KEY,
   `userId` int(11)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 CREATE TABLE `ProductsInCollections` (
   `productId` int(11),
   `collectionId` int(11),
   PRIMARY KEY (`productId`, `collectionId`)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 CREATE TABLE `ProductsInCategories` (
   `productId` int(11),
   `categoryId` int(11),
   PRIMARY KEY (`productId`, `categoryId`)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 CREATE TABLE `UsersRatingProducts` (
   `userId` int(11),
@@ -86,14 +86,14 @@ CREATE TABLE `UsersRatingProducts` (
   `comment` text,
   `star` int,
   PRIMARY KEY (`userId`, `productId`)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 CREATE TABLE `Details` (
   `sizeName` varchar(10),
   `quantity` int,
   `productId` int(11),
   PRIMARY KEY (`sizeName`, `quantity`, `productId`)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 CREATE TABLE `Sizes` (
   `sizeName` varchar(10),
@@ -101,13 +101,13 @@ CREATE TABLE `Sizes` (
   `productId` int(11),
   `price` float,
   PRIMARY KEY (`sizeName`, `quantity`, `productId`, `price`)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 CREATE TABLE `Images` (
   `productId` int(11),
   `imageLink` varchar(500),
   PRIMARY KEY (`productId`, `imageLink`)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 ALTER TABLE `Carts` ADD CONSTRAINT `cart_user_fk` FOREIGN KEY (`userId`) REFERENCES `Users` (`userId`) ON DELETE CASCADE;
 

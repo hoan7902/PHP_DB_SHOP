@@ -202,7 +202,7 @@ class UsersController extends Controller
                     $this->status(200);
                     return $this->response(['status' => true, 'message' => 'Update successfully']);
                 } else {
-                    $this->status(500);
+                    $this->status(400);
                     return $this->response(['status' => false, 'message' => 'Update failed']);
                 }
             } catch (Exception $e) {
