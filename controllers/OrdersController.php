@@ -102,7 +102,7 @@ class OrdersController extends Controller
                 // Check and update cart
                 $this->checkAndRemoveProductsInCart($userId, $products);
                 $this->status(201);
-                return $this->response(['status' => true, 'message' => 'Order successfully']);
+                return $this->response(['status' => true, 'message' => 'Order successfully', 'orderId' => $orderId]);
             } else {
                 $this->status(400);
                 return $this->response(['status' => false, 'message' => 'Wrong data']);
