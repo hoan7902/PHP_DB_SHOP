@@ -86,7 +86,7 @@ class CartsController extends Controller
                 }
                 if ($this->isValidProduct($productId, $size)) {
                     if ($this->isValidInCart($userId, $productId, $size)) {
-                        $this->cartsModel->removeOneFromCart($userId, $productId);
+                        $this->cartsModel->removeOneFromCart($userId, $productId, $size);
                         if (mysqli_affected_rows($this->cartsModel->getConn()) == 1) {
                             $this->status(204);
                             return;
