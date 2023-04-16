@@ -158,4 +158,20 @@ class ProductsModel extends Model
         $mergeData = ['count' => $count, 'data' => $data];
         return $mergeData;
     }
+    public function isValidProduct($productId, $sizeName)
+    {
+        $sql = "
+            SELECT * FROM products
+            INNER JOIN sizes ON products.productId = sizes.productId
+            WHERE products.productId = {$productId} AND sizes.sizeName = '{$sizeName}';
+        ";
+        $query = $this->query($sql);
+        $data = [];
+        if ($query) {
+            while ($row = mysqli_fetch_assoc($query)) {
+                array_push($data, $row);
+            }
+        }
+        return $data;
+    }
 }

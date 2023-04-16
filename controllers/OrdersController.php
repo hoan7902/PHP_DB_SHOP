@@ -26,6 +26,11 @@ class OrdersController extends Controller
             $phone = RestApi::bodyData('phone');
             $note = RestApi::bodyData('note');
             $address = RestApi::bodyData('address');
+            $paymentMethod = RestApi::bodyData('paymentMethod');
+            // Validate payment method
+            if (!in_array($paymentMethod, ['Cash', 'Momo Pay'])) {
+                $paymentMethod = 'Cash';
+            }
             // Validate products data
             if ($products == null) {
                 $this->status(400);
@@ -86,7 +91,7 @@ class OrdersController extends Controller
                     $sizesModel->updateQuantity($value['productId'], $value['size'], $size['quantity'] - $value['quantity']);
                 }
                 // Insert Order
-                $this->ordersModel->insertOrder($phone, $cost, $note, $address);
+                $this->ordersModel->insertOrder($phone, $cost, $note, $address, $paymentMethod);
                 $orderId = $this->ordersModel->getConn()->insert_id;
                 // Insert UsersHaveOrders
                 $usersHaveOrdersModel = new UsersHaveOrdersModel();
@@ -94,11 +99,8 @@ class OrdersController extends Controller
                 // Insert ProductsInOrders
                 $productsInOrdersModel = new ProductsInOrdersModel();
                 $productsInOrdersModel->insertProductsInOrder($orderId, $products);
-                $productIds = [];
-                foreach ($products as $product) {
-                    array_push($productIds, $product['productId']);
-                }
-                $this->checkAndRemoveProductsInCart($userId, $productIds);
+                // Check and update cart
+                $this->checkAndRemoveProductsInCart($userId, $products);
                 $this->status(201);
                 return $this->response(['status' => true, 'message' => 'Order successfully']);
             } else {
@@ -121,16 +123,31 @@ class OrdersController extends Controller
             $status = RestApi::bodyData('status');
             $orderId = RestApi::bodyData('orderId');
             // Validate status
-            if (!in_array($status, ['Pending', 'Accepted', 'Shipping', 'Done'])) {
+            if (!in_array($status, ['Pending', 'Accepted', 'Shipping', 'Done', 'Canceled'])) {
                 $this->status(400);
                 return $this->response(['status' => false, 'message' => 'Status is invalid']);
             }
-            $done = false;
+            $done = null;
             if ($status == 'Done') {
-                $done = true;
+                $done = 'Done';
+            } else if ($status == 'Canceled') {
+                $done = 'Canceled';
+            }
+            $od = $this->ordersModel->getBy(['orderId' => $orderId]);
+            $returnProduct = true;
+            if (count($od) > 0) {
+                if (in_array($od[0]['status'], ['Done', 'Canceled'])) {
+                    $returnProduct = false;
+                }
             }
             $query = $this->ordersModel->updateStatus($orderId, $status, $done);
             if ($query > 0) {
+                if ($done == 'Canceled') {
+                    // Check and update product
+                    if ($returnProduct) {
+                        $this->checkAndUpdateProductsInOrder($orderId);
+                    }
+                }
                 $this->status(200);
                 return $this->response(['status' => true, 'message' => 'Update successfully']);
             } else {
@@ -161,14 +178,16 @@ class OrdersController extends Controller
                 $listStt = [];
                 if (is_array($statusArr) && count($statusArr) > 0) {
                     foreach ($statusArr as $stt) {
-                        if ($stt == 'pending') {
+                        if (in_array($stt, ['pending', 'Pending'])) {
                             array_push($listStt, 'Pending');
-                        } else if ($stt == 'accepted') {
+                        } else if (in_array($stt, ['accepted', 'Accepted'])) {
                             array_push($listStt, 'Accepted');
-                        } else if ($stt == 'shipping') {
+                        } else if (in_array($stt, ['shipping', 'Shipping'])) {
                             array_push($listStt, 'Shipping');
-                        } else if ($stt == 'done') {
+                        } else if (in_array($stt, ['done', 'Done'])) {
                             array_push($listStt, 'Done');
+                        } else if (in_array($stt, ['canceled', 'Canceled'])) {
+                            array_push($listStt, 'Canceled');
                         }
                     }
                 }
@@ -203,14 +222,16 @@ class OrdersController extends Controller
                 $listStt = [];
                 if (is_array($statusArr) && count($statusArr) > 0) {
                     foreach ($statusArr as $stt) {
-                        if ($stt == 'pending') {
+                        if (in_array($stt, ['pending', 'Pending'])) {
                             array_push($listStt, 'Pending');
-                        } else if ($stt == 'accepted') {
+                        } else if (in_array($stt, ['accepted', 'Accepted'])) {
                             array_push($listStt, 'Accepted');
-                        } else if ($stt == 'shipping') {
+                        } else if (in_array($stt, ['shipping', 'Shipping'])) {
                             array_push($listStt, 'Shipping');
-                        } else if ($stt == 'done') {
+                        } else if (in_array($stt, ['done', 'Done'])) {
                             array_push($listStt, 'Done');
+                        } else if (in_array($stt, ['canceled', 'Canceled'])) {
+                            array_push($listStt, 'Canceled');
                         }
                     }
                 }
@@ -278,19 +299,27 @@ class OrdersController extends Controller
         if (preg_match('/^\(?(\d{3})\)?[- ]?(\d{3})[- ]?(\d{4})$/', $phone)) return true;
         return false;
     }
-    private function checkAndRemoveProductsInCart($userId, $productIds)
+    private function checkAndRemoveProductsInCart($userId, $products)
     {
         try {
             $cartsContrller = new CartsController();
             $cartsModel = new CartsModel();
-            foreach ($productIds as $productId) {
-                if ($cartsContrller->isValidInCart($userId, $productId)) {
-                    $cartsModel->removeOneFromCart($userId, $productId);
+            foreach ($products as $product) {
+                if ($cartsContrller->isValidInCart($userId, $product['productId'], $product['size'])) {
+                    $cartsModel->removeOneFromCart($userId, $product['productId'], $product['size']);
                 }
             }
             return true;
         } catch (Exception $e) {
             return false;
+        }
+    }
+    private function checkAndUpdateProductsInOrder($orderId)
+    {
+        $products = $this->ordersModel->getProductsInAnOrder($orderId);
+        $sizesModel = new SizesModel();
+        foreach ($products as $product) {
+            $sizesModel->changeQuantity($product['productId'], $product['size'], $product['quantity'], true);
         }
     }
 }

@@ -18,29 +18,42 @@ class CartsController extends Controller
         $role = authHeader($authHeader);
         if (in_array($role, ['customer', 'self', 'admin'])) {
             try {
-
                 $userId = getUserId($authHeader);
                 $params = HandleUri::sliceUri();
                 $productId = $params ? ($params[2] ? $params[2] : null) : null;
+                $size = RestApi::bodyData('size');
+                if ($size == null) {
+                    $this->status(400);
+                    throw new Exception('Missing size');
+                }
+                $quantity = RestApi::bodyData('quantity');
+                $quantity = $quantity ? ((int)$quantity > 0 ? (int)$quantity : 1) : 1;
                 if ($productId === null) {
                     $this->status(400);
                     throw new Exception('Product ID does not exist');
                 }
-                if ($this->isValidProduct($productId)) {
-                    if (!$this->isValidInCart($userId, $productId)) {
-                        $query = $this->cartsModel->addToCart($userId, $productId);
-                        if ($query) {
-                            if (mysqli_affected_rows($this->cartsModel->getConn()) > 0) {
-                                $this->status(201);
-                                return $this->response(['status' => true, 'message' => 'Add successfully']);
-                            } else {
-                                $this->status(400);
-                                throw new Exception('Add failed');
-                            }
+                $checkProduct = $this->isValidProduct($productId, $size);
+                if (count($checkProduct) == 1) {
+                    if ($this->isValidInCart($userId, $productId, $size)) {
+                        // Update cart
+                        $updated = $this->cartsModel->updateProductInCart($userId, $productId, $size, $quantity);
+                        if ($updated > 0) {
+                            $this->status(200);
+                            return $this->response(['status' => true, 'data' => ['name' => $checkProduct[0]['name'], 'size' => $checkProduct[0]['sizeName'], 'unitPrice' => (int)$checkProduct[0]['price'], 'quantity' => $quantity, 'price' => $checkProduct[0]['price'] * $quantity]]);
+                        } else {
+                            $this->status(200);
+                            return $this->response(['status' => false, 'message' => 'Nothing updates']);
                         }
                     } else {
-                        $this->status(400);
-                        throw new Exception('Product exists in cart');
+                        // Add to cart
+                        $added = $this->cartsModel->addToCart($userId, $productId, $size, $quantity);
+                        if ($added) {
+                            $this->status(201);
+                            return $this->response(['status' => true, 'data' => ['name' => $checkProduct[0]['name'], 'size' => $checkProduct[0]['sizeName'], 'unitPrice' => (int)$checkProduct[0]['price'], 'quantity' => $quantity, 'price' => $checkProduct[0]['price'] * $quantity]]);
+                        } else {
+                            $this->status(400);
+                            throw new Exception('Add to cart failed');
+                        }
                     }
                 } else {
                     $this->status(400);
@@ -66,12 +79,13 @@ class CartsController extends Controller
                 $userId = getUserId($authHeader);
                 $params = HandleUri::sliceUri();
                 $productId = $params ? ($params[2] ? $params[2] : null) : null;
+                $size = RestApi::bodyData('size');
                 if ($productId === null) {
                     $this->status(400);
                     throw new Exception('Product ID does not exist');
                 }
-                if ($this->isValidProduct($productId)) {
-                    if ($this->isValidInCart($userId, $productId)) {
+                if ($this->isValidProduct($productId, $size)) {
+                    if ($this->isValidInCart($userId, $productId, $size)) {
                         $this->cartsModel->removeOneFromCart($userId, $productId);
                         if (mysqli_affected_rows($this->cartsModel->getConn()) == 1) {
                             $this->status(204);
@@ -82,7 +96,7 @@ class CartsController extends Controller
                         }
                     } else {
                         $this->status(400);
-                        throw new Exception('Product does not exist');
+                        throw new Exception('Product does not exist in your cart');
                     }
                 } else {
                     $this->status(400);
@@ -124,24 +138,21 @@ class CartsController extends Controller
             return $this->response(['status' => false, 'message' => 'Not Authorized']);
         }
     }
-    public function isValidProduct($productId)
+    private function isValidProduct($productId, $size)
     {
         try {
             $productsModel = new ProductsModel();
-            $product = $productsModel->getById($productId, ['*']);
-            if (count($product) == 1) {
-                return true;
-            }
-            return false;
+            $data = $productsModel->isValidProduct($productId, $size);
+            return $data;
         } catch (Exception $e) {
-            return false;
+            return [];
         }
     }
-    public function isValidInCart($userId, $productId)
+    public function isValidInCart($userId, $productId, $size)
     {
         try {
             $cartsModel = new CartsModel();
-            $cart = $cartsModel->getBy(['userId' => $userId, 'productId' => $productId]);
+            $cart = $cartsModel->getBy(['userId' => $userId, 'productId' => $productId, 'size' => $size]);
             if (count($cart) > 0) {
                 return true;
             }

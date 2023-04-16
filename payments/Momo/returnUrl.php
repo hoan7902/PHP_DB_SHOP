@@ -41,18 +41,23 @@ if (!empty($_GET)) {
                     break;
                 }
             }
-            print_r($orderID);
             $momoHandler = new MomoHandler();
             try {
                 $res = $momoHandler->updateOrderPaid($orderID, $responseTime);
+                echo json_encode(['status' => true, 'message' => 'Oke']);
+                return;
             } catch (Exception $e) {
-                return json_encode(['status' => false, 'message' => $e->getMessage()]);
+                echo json_encode(['status' => false, 'message' => $e->getMessage()]);
+                return;
             }
-            return json_encode(['status' => true, 'message' => 'Oke']);
         } else {
-            return json_encode(['status' => false, 'message' => 'Failed']);
+            echo json_encode(['status' => false, 'message' => 'Failed']);
+            return;
         }
     } else {
-        return json_encode(['status' => false, 'message' => 'Can be hacked']);
+        echo json_encode(['status' => false, 'message' => 'Can be hacked']);
+        return;
     }
 }
+echo json_encode(['status' => false, 'message' => 'Failed']);
+return;

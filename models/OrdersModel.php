@@ -9,17 +9,17 @@ class OrdersModel extends Model
     {
         $this->table = 'Orders';
     }
-    public function insertOrder($phone, $cost, $note, $address)
+    public function insertOrder($phone, $cost, $note, $address, $paymentMethod)
     {
-        return $this->insert(['phone' => $phone, 'cost' => $cost, 'note' => $note, 'address' => $address]);
+        return $this->insert(['phone' => $phone, 'cost' => $cost, 'note' => $note, 'address' => $address, 'paymentMethod' => $paymentMethod]);
     }
     public function deleteOrder($orderId)
     {
         return $this->delete(['orderId' => $orderId]);
     }
-    public function updateStatus($orderId, $status, $deliveryTime = false)
+    public function updateStatus($orderId, $status, $done = null)
     {
-        if ($deliveryTime) {
+        if ($done == 'Done') {
             $currentTime = date('Y-m-d H:i:s');
             return $this->updateOne(['orderId' => $orderId], ['status' => $status, 'deliveryTime' => $currentTime, 'paid' => 1, 'paymentDate' => $currentTime]);
         }
@@ -102,6 +102,20 @@ class OrdersModel extends Model
                 array_push($data, $row);
             }
             return $data;
+        }
+        return $data;
+    }
+    public function getProductsInAnOrder($orderId)
+    {
+        $sql = "SELECT po.productId, po.size, po.quantity FROM Orders o 
+        INNER JOIN ProductsInOrders po ON o.orderId = po.orderId
+        WHERE o.orderId = {$orderId}";
+        $query = $this->query($sql);
+        $data = [];
+        if ($query) {
+            while ($row = mysqli_fetch_assoc($query)) {
+                array_push($data, $row);
+            }
         }
         return $data;
     }

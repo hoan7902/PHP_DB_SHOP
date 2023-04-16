@@ -38,4 +38,26 @@ class SizesModel extends Model
     {
         return $this->updateOne(['productId' => $productId, 'sizeName' => $sizeName], ['quantity' => $quantity]);
     }
+    public function changeQuantity($productId, $sizeName, $number, $increase = true)
+    {
+        try {
+            $number = (int)$number;
+            if ($number > 0) {
+                if ($increase) {
+                    $sign = "+";
+                } else {
+                    $sign = "-";
+                }
+                $sql = "UPDATE {$this->table} SET quantity = quantity {$sign} {$number} WHERE productId = {$productId} AND sizeName = '{$sizeName}';";
+                print_r($sql);
+                $query = $this->query($sql);
+                if ($query) {
+                    return true;
+                }
+            }
+            return false;
+        } catch (Exception $e) {
+            return false;
+        }
+    }
 }

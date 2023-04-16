@@ -35,7 +35,7 @@ class UsersController extends Controller
             if ($user) {
                 if (verifyPassword($password, $user['password'])) {
                     $this->status(200);
-                    return $this->response(['status' => true, 'token' => genToken(["userId" => $user['userId'], "role" => $user['role']]), 'data' => ['name' => $user['name'], 'email' => $user['email'], 'role' => $user['role'], 'avatar' => $user['avatar']]]);
+                    return $this->response(['status' => true, 'token' => genToken(["userId" => $user['userId'], "role" => $user['role']]), 'data' => ['userId' => $user['userId'], 'name' => $user['name'], 'email' => $user['email'], 'role' => $user['role'], 'avatar' => $user['avatar']]]);
                 } else {
                     $this->status(400);
                     return $this->response(['status' => false, 'message' => "Login failed!"]);

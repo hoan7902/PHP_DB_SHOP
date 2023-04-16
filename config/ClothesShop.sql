@@ -47,10 +47,11 @@ CREATE TABLE `Categories` (
 
 CREATE TABLE `Carts` (
   `cartId` int(11) PRIMARY KEY AUTO_INCREMENT,
+  `productId` int(11),
   `userId` int(11) NOT NULL,
-  `productId` int(11) NOT NULL,
-  `time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  UNIQUE (`userId`, `productId`)
+  `size` varchar(10),
+  `quantity` int(11) DEFAULT 1,
+  `time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
 CREATE TABLE `ProductsInOrders` (

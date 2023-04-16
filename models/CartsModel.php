@@ -8,9 +8,9 @@ class CartsModel extends Model
     {
         $this->table = "Carts";
     }
-    public function addToCart($userId, $productId)
+    public function addToCart($userId, $productId, $size, $quantity)
     {
-        return $this->insert(['userId' => $userId, 'productId' => $productId]);
+        return $this->insert(['userId' => $userId, 'productId' => $productId, 'size' => $size, 'quantity' => $quantity]);
     }
     public function removeFromCartByCartId($cartId)
     {
@@ -20,22 +20,28 @@ class CartsModel extends Model
     {
         return $this->delete(['userId' => $userId]);
     }
-    public function removeOneFromCart($userId, $productId)
+    public function removeOneFromCart($userId, $productId, $size)
     {
-        return $this->delete(['userId' => $userId, 'productId' => $productId]);
+        return $this->delete(['userId' => $userId, 'productId' => $productId, 'size' => $size]);
+    }
+    public function updateProductInCart($userId, $productId, $size, $quantity)
+    {
+        return $this->updateOne(['userId' => $userId, 'productId' => $productId, 'size' => $size], ['quantity' => $quantity]);
     }
     public function getProductsInCart($userId, $limit = 12, $frame = 1)
     {
         $offset = ($frame - 1) * $limit;
         $sql = "
-            SELECT c.productId, c.time, p.name, p.description, i.imageLink FROM Carts c
-            INNER JOIN Products p ON c.productId = p.productId
-            INNER JOIN Images i ON c.productId = i.productId
-            WHERE c.userId = {$userId}
-            GROUP BY c.productId
+            SELECT c.*, s.price AS unitPrice, pi.name as name, pi.imageLink AS image FROM Carts c 
+            INNER JOIN 
+            (SELECT p.*, i.imageLink FROM Products p 
+            INNER JOIN Images i ON p.productId = i.productId 
+            GROUP BY p.productId) pi ON pi.productId = c.productId
+            INNER JOIN Sizes s ON s.productId = pi.productId AND s.sizeName = c.size
+            WHERE c.userId = 9
             ORDER BY c.time DESC
             LIMIT {$limit}
-            OFFSET {$offset}
+            OFFSET {$offset};
         ";
         $query = $this->query($sql);
         $data = [];
