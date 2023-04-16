@@ -38,7 +38,7 @@ class CartsModel extends Model
             INNER JOIN Images i ON p.productId = i.productId 
             GROUP BY p.productId) pi ON pi.productId = c.productId
             INNER JOIN Sizes s ON s.productId = pi.productId AND s.sizeName = c.size
-            WHERE c.userId = 9
+            WHERE c.userId = {$userId}
             ORDER BY c.time DESC
             LIMIT {$limit}
             OFFSET {$offset};
