@@ -28,7 +28,7 @@ class Routes
 
     private function matchUri($regex)
     {
-        $uri = isset($_GET['uri']) ? trim($_GET['uri']) : null;
+        $uri = isset($_GET['uri']) ? trim($_GET['uri']) : "";
         return preg_match($regex, $uri);
     }
 }
