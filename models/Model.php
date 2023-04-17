@@ -86,7 +86,7 @@ class Model extends Database
         $query = $this->query($sql);
         return $query;
     }
-    public function getNRecords($selects = ['*'], $keys = [],  $orderBys, $frame = 1, $limit = 24, $order = 'ASC')
+    public function getNRecords($selects = ['*'], $keys = [],  $orderBys = [], $frame = 1, $limit = 24, $order = 'ASC')
     {
         $columns = implode(', ', $selects);
         $orderBysString = implode(' ', $orderBys);
