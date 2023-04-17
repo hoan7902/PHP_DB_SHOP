@@ -15,3 +15,5 @@ RewriteRule ^payment/momo/return(.*)$ payments/Momo/returnUrl.php$1 [L]
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteRule ^(.+)$ index.php?uri=$1 [L,QSA]
+
+Options -Indexes
