@@ -49,7 +49,6 @@ class SizesModel extends Model
                     $sign = "-";
                 }
                 $sql = "UPDATE {$this->table} SET quantity = quantity {$sign} {$number} WHERE productId = {$productId} AND sizeName = '{$sizeName}';";
-                print_r($sql);
                 $query = $this->query($sql);
                 if ($query) {
                     return true;
