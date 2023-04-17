@@ -66,10 +66,10 @@ class CategoriesController extends Controller
                 return $this->response(['status' => true, 'count' => $count, 'categories' => $data]);
             } else {
                 $this->status(400);
-                return $this->response(['status' => false, 'No categories']);
+                return $this->response(['status' => false, 'message' => 'No categories']);
             }
         } catch (Exception $e) {
-            $this->status(500);
+            $this->status(400);
             $this->response(['status' => false, 'message' => 'Get category error: ' . $e->getMessage()]);
         }
     }
