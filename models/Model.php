@@ -86,7 +86,7 @@ class Model extends Database
         $query = $this->query($sql);
         return $query;
     }
-    public function getNRecords($selects = ['*'], $keys = [],  $orderBys = [], $frame = 1, $limit = 24)
+    public function getNRecords($selects = ['*'], $keys = [],  $orderBys, $frame = 1, $limit = 24, $order = 'ASC')
     {
         $columns = implode(', ', $selects);
         $orderBysString = implode(' ', $orderBys);
@@ -99,7 +99,8 @@ class Model extends Database
             $where = "WHERE " . $where;
         }
         $offset = ($frame - 1) * $limit;
-        $sql = "SELECT $columns FROM $this->table $where ORDER BY $orderBysString LIMIT $limit OFFSET $offset ;";
+        $offset =
+            $sql = "SELECT $columns FROM $this->table $where ORDER BY $orderBysString {$order} LIMIT {$limit} OFFSET {$offset} ;";
         $query = $this->query($sql);
         $data = [];
         while ($row = mysqli_fetch_assoc($query)) {

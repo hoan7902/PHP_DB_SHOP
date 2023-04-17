@@ -113,12 +113,18 @@ class UsersController extends Controller
         $limit = RestApi::getParams('limit');
         $limit = $limit ? ((int)$limit > 0 ? (int)$limit : 24) : 24;
         $frame = RestApi::getParams('frame');
-        $limit = $limit ? ((int)$limit > 0 ? (int)$limit : 1) : 1;
+        $frame = $frame ? ((int)$frame > 0 ? (int)$frame : 1) : 1;
+        $orderBy = RestApi::getParams('order_by');
+        if ($orderBy == 'desc') {
+            $orderBy = 'DESC';
+        } else {
+            $orderBy = 'ASC';
+        }
         $restAPI = new RestApi();
         $authHeader = $restAPI->headerData('Authorization');
         $role = authHeader($authHeader);
         if ($role == 'admin') {
-            $users = $this->usersModel->getNRecords(['userId', 'name', 'phone', 'sex', 'email', 'avatar', 'address', 'role'], [], ['userId'], $frame, $limit);
+            $users = $this->usersModel->getNRecords(['userId', 'name', 'phone', 'sex', 'email', 'avatar', 'address', 'role'], [], ['userId'], $frame, $limit, $orderBy);
             $this->status(200);
             return $this->response(["status" => true, "users" => $users]);
         } else if ($role == 'Not Authenticated') {
