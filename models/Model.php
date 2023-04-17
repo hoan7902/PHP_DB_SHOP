@@ -128,7 +128,7 @@ class Model extends Database
             $sql = "UPDATE $this->table $setStr $whereStr ;";
             $query = $this->query($sql);
             if ($query) {
-                return mysqli_affected_rows($this->conn);
+                return $this->conn->affected_rows;
             }
             return 0;
         } catch (Exception $e) {
