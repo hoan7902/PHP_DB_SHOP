@@ -1,5 +1,8 @@
 RewriteEngine On
 
+RewriteCond %{HTTP:Authorization} ^(.*)
+RewriteRule ^(.*) - [E=HTTP_AUTHORIZATION:%1]
+
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteRule ^payment/momo/([0-9]+)/?$ payments/Momo/index.php?orderId=$1 [L]
