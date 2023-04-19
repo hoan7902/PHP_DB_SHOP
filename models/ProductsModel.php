@@ -72,7 +72,7 @@ class ProductsModel extends Model
                     Products.deleted = 0
                     {$catsString}
                 GROUP BY 
-                    products.productId
+                    Products.productId
                 HAVING 
                     minPrice >= {$minPrice} AND maxPrice <= {$maxPrice}
                 ORDER BY 
