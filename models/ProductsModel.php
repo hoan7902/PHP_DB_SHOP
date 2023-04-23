@@ -105,6 +105,12 @@ class ProductsModel extends Model
                     {$sortBy} {$orderBy};
             ";
         } else if (in_array($sortBy, ['orderCount'])) {
+            $catsString = "";
+            if (is_array($categories) && count($categories) > 0) {
+                foreach ($categories as $value) {
+                    $catsString = $catsString . "AND pc.categoryId = '{$value}' ";
+                }
+            }
             $sql = "
                 SELECT 
                     p.productId, 
