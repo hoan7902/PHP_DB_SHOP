@@ -98,7 +98,7 @@ class ProductsModel extends Model
                     Products.deleted = 0
                     {$catsString}
                 GROUP BY 
-                    products.productId
+                    Products.productId
                 HAVING 
                     minPrice >= {$minPrice} AND maxPrice <= {$maxPrice}
                 ORDER BY 
@@ -161,9 +161,9 @@ class ProductsModel extends Model
     public function isValidProduct($productId, $sizeName)
     {
         $sql = "
-            SELECT * FROM products
-            INNER JOIN sizes ON products.productId = sizes.productId
-            WHERE products.productId = {$productId} AND sizes.sizeName = '{$sizeName}';
+            SELECT * FROM Products
+            INNER JOIN Sizes ON Products.productId = Sizes.productId
+            WHERE Products.productId = {$productId} AND Sizes.sizeName = '{$sizeName}';
         ";
         $query = $this->query($sql);
         $data = [];

@@ -13,7 +13,7 @@ CREATE TABLE `Users` (
 
 CREATE TABLE `Orders` (
   `orderId` int(11) PRIMARY KEY AUTO_INCREMENT,
-  `status` ENUM('Pending','Accepted','Shipping','Done') DEFAULT 'Pending',
+  `status` ENUM('Pending','Accepted','Shipping','Done','Canceled') DEFAULT 'Pending',
   `phone` varchar(20),
   `cost` float,
   `note` varchar(255),

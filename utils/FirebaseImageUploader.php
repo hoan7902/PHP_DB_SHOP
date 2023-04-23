@@ -35,6 +35,9 @@ class FirebaseStorageUploader
             // Parse the response to get the download URL for the image
             $responseObj = json_decode($response);
             $downloadUrl = $responseObj->downloadTokens;
+            if ($downloadUrl == null) {
+                throw new Exception("Upload image failed");
+            }
             $imageUrl  = "https://firebasestorage.googleapis.com/v0/b/vanlam-clothesshop.appspot.com/o/images%2F" . $imageName . "?alt=media&token=" . $downloadUrl;
             return $imageUrl;
         } catch (Exception $e) {
