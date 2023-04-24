@@ -32,9 +32,3 @@ To install and run the server, follow these steps:
 ## Authentication
 
 Some API endpoints require authentication using an access token. To get an access token, you must first authenticate by sending a POST request to the `api/user/login` endpoint with your email and password. The server will respond with a JSON object containing the access token, which you must include in subsequent requests using the Authorization header with the value `Bearer <token>`.
-
-## Author
-
--   Le Van Lam
--   Email: vanlam.cs76@gmail.com
--   GitHub: [VanLamCS](https://github.com/VanLamCS)
